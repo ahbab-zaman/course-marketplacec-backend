@@ -59,7 +59,7 @@ export class GoogleAuthService {
             data: {
               name,
               email,
-              role: Role.CUSTOMER,
+              role: Role.STUDENT,
               isEmailVerified: true,
               provider: AuthProvider.GOOGLE,
               providerId: googleId,

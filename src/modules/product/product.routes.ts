@@ -21,7 +21,7 @@ router.get("/:slug", productController.getProductBySlug);
 
 // ── Seller Routes ────────────────────────────────────────────────────────────
 const sellerRouter = Router();
-sellerRouter.use(authorize(Role.SELLER));
+sellerRouter.use(authorize(Role.INSTRUCTOR));
 
 // Products
 sellerRouter.get("/me", productController.getSellerProducts);
@@ -47,7 +47,7 @@ sellerRouter.post("/:id/specs", productController.addSpec);
 sellerRouter.patch("/:id/specs/:specId", productController.updateSpec);
 sellerRouter.delete("/:id/specs/:specId", productController.removeSpec);
 
-router.use("/seller", sellerRouter);
+router.use("/instructor", sellerRouter);
 
 // ── Admin Routes ─────────────────────────────────────────────────────────────
 const adminRouter = Router();

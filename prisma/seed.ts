@@ -4,13 +4,9 @@ import { PrismaPg } from "@prisma/adapter-pg";
 import pg from "pg";
 import bcrypt from "bcrypt";
 
-// ─── Prisma Initialization ────────────────────────────────────────────────────
-
 const pool = new pg.Pool({ connectionString: process.env.DATABASE_URL });
 const adapter = new PrismaPg(pool);
 const prisma = new PrismaClient({ adapter });
-
-// ─── Config ──────────────────────────────────────────────────────────────────
 
 const SALT_ROUNDS = 10;
 
@@ -24,10 +20,10 @@ interface SeedUser {
 function loadSeedUsers(): SeedUser[] {
   const adminEmail = process.env.SEED_ADMIN_EMAIL;
   const adminPass = process.env.SEED_ADMIN_PASSWORD;
-  const sellerEmail = process.env.SEED_SELLER_EMAIL;
-  const sellerPass = process.env.SEED_SELLER_PASSWORD;
+  const instructorEmail = process.env.SEED_INSTRUCTOR_EMAIL;
+  const instructorPass = process.env.SEED_INSTRUCTOR_PASSWORD;
 
-  if (!adminEmail || !adminPass || !sellerEmail || !sellerPass) {
+  if (!adminEmail || !adminPass || !instructorEmail || !instructorPass) {
     throw new Error(
       "[Seed] Missing required seed credentials in environment variables.",
     );
@@ -41,29 +37,24 @@ function loadSeedUsers(): SeedUser[] {
       role: Role.ADMIN,
     },
     {
-      name: "Seller",
-      email: sellerEmail,
-      password: sellerPass,
-      role: Role.SELLER,
+      name: "Instructor",
+      email: instructorEmail,
+      password: instructorPass,
+      role: Role.INSTRUCTOR,
     },
   ];
 }
 
-// ─── Logger ───────────────────────────────────────────────────────────────────
-
 const log = {
-  info: (msg: string) => console.log(`  ℹ  ${msg}`),
-  success: (msg: string) => console.log(`  ✅ ${msg}`),
-  skip: (msg: string) => console.log(`  ⏭  ${msg}`),
-  error: (msg: string) => console.error(`  ❌ ${msg}`),
-  banner: (msg: string) =>
-    console.log(`\n${"─".repeat(50)}\n${msg}\n${"─".repeat(50)}`),
+  info: (msg: string) => console.log(`[seed] ${msg}`),
+  success: (msg: string) => console.log(`[seed] ${msg}`),
+  skip: (msg: string) => console.log(`[seed] ${msg}`),
+  error: (msg: string) => console.error(`[seed] ${msg}`),
+  banner: (msg: string) => console.log(`\n${"=".repeat(50)}\n${msg}\n${"=".repeat(50)}`),
 };
 
-// ─── Seeder Logic ────────────────────────────────────────────────────────────
-
 export async function runSeeder(): Promise<void> {
-  log.banner("StoreFront Backend — Database Seeder");
+  log.banner("Course Marketplace Backend Database Seeder");
 
   try {
     const users = loadSeedUsers();
@@ -77,7 +68,7 @@ export async function runSeeder(): Promise<void> {
       });
 
       if (existing) {
-        log.skip(`${user.role} already exists  →  ${user.email}`);
+        log.skip(`${user.role} already exists -> ${user.email}`);
         continue;
       }
 
@@ -90,15 +81,15 @@ export async function runSeeder(): Promise<void> {
           password: hashedPassword,
           role: user.role,
           provider: "LOCAL",
-          isEmailVerified: true, // Seed users bypass OTP flow
+          isEmailVerified: true,
         },
         select: { id: true, email: true, role: true },
       });
 
-      log.success(`Created ${created.role}  →  ${created.email}`);
+      log.success(`Created ${created.role} -> ${created.email}`);
     }
 
-    log.banner("Seeding complete ✅");
+    log.banner("Seeding complete");
   } catch (err) {
     log.error(
       `Seeding failed: ${err instanceof Error ? err.message : String(err)}`,
@@ -109,8 +100,6 @@ export async function runSeeder(): Promise<void> {
     log.info("Disconnected from database");
   }
 }
-
-// ─── Exec ────────────────────────────────────────────────────────────────────
 
 if (import.meta.url.endsWith("seed.ts")) {
   runSeeder().catch(() => process.exit(1));

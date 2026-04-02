@@ -274,12 +274,16 @@ Make startup deterministic and align configuration with the target platform.
   - `prisma/schema/store.prisma`
   - `prisma/schema/product.prisma`
   - `prisma/schema/cart.prisma`
+- Regenerated Prisma Client against the new course-domain schema.
+- Replaced active runtime role references in mounted/auth paths to use:
+  - `Role.INSTRUCTOR`
+  - `Role.STUDENT`
+- Updated seed env naming and seed defaults toward `INSTRUCTOR`.
 
 **Remaining work in this phase:**
 
-- Align the runtime TypeScript codebase with the new Prisma role names after Prisma client regeneration.
-- Verify the final Prisma schema with `prisma validate` and `prisma generate` once local Prisma engine access is available.
-- Complete any auth/service/seed/runtime references that still use `SELLER` and `CUSTOMER`.
+- Complete leftover legacy comments and retired-code references that still mention `SELLER` and `CUSTOMER`.
+- Remove the remaining legacy commerce modules instead of only excluding them from TypeScript compilation.
 
 **Objective:**
 Move Prisma types from the commerce domain to the course domain while preserving Better Auth compatibility.
@@ -318,7 +322,20 @@ Move Prisma types from the commerce domain to the course domain while preserving
 
 ## 6. Replace Active Domain Schema With Course Models
 
-**Status:** `[ ]`
+**Status:** `[~]`
+
+**Completed work so far:**
+
+- Replaced the commerce Prisma models with course-domain models in the schema files.
+- Retired cart schema definitions from the active datamodel.
+- Unmounted the legacy commerce routes from `src/routes/index.ts` so the active API surface no longer exposes them.
+- Temporarily excluded retired commerce modules from `tsconfig.json` so the active application can compile during the cutover.
+
+**Remaining work in this phase:**
+
+- Introduce the new course-platform modules and routes to replace the retired commerce modules.
+- Remove the retired commerce source files instead of only excluding them from compilation.
+- Align the remaining app code to the new course-domain data model.
 
 **Objective:**
 Replace store/product/cart schema with course marketplace schema.
@@ -414,7 +431,18 @@ Replace store/product/cart schema with course marketplace schema.
 
 ## 7. Create And Validate Migration Strategy
 
-**Status:** `[ ]`
+**Status:** `[~]`
+
+**Completed work so far:**
+
+- `npx prisma generate` succeeded after regenerating the Prisma client for the new schema.
+- `npx prisma validate` succeeded and confirmed the schemas under `prisma/schema` are valid.
+
+**Remaining work in this phase:**
+
+- Create the first cutover migration file for the course marketplace schema.
+- Resolve the role-enum data warning for existing `SELLER` and `CUSTOMER` values during migration.
+- Apply or test migrations against the target database once database-level approval is granted.
 
 **Objective:**
 Generate a safe, executable Prisma migration path for the course-domain cutover.

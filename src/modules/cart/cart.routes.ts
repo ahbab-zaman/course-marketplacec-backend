@@ -6,8 +6,8 @@ import authorize from "../../shared/middlewares/authorize.middleware";
 const router = Router();
 const cartController = new CartController();
 
-// All cart routes require authentication + CUSTOMER role
-router.use(authorize(Role.CUSTOMER));
+// Legacy cart routes still require an authenticated student while the module is being retired.
+router.use(authorize(Role.STUDENT));
 
 // ── Cart ─────────────────────────────────────────────────────────────────────
 

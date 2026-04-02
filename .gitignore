@@ -27,3 +27,6 @@ uploads/
 .rules
 .skills/
 /docs
+.skills/rules
+.skills/rules/General-Rules.mdc
+docs

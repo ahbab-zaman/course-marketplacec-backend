@@ -20,7 +20,7 @@ export class AuthController {
       const result = await authService.register({
         ...data,
         // Never trust client role on public registration
-        role: Role.CUSTOMER,
+        role: Role.STUDENT,
       });
       return success(res, result, "User registered successfully");
     } catch (err) {

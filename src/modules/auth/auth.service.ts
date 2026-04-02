@@ -27,7 +27,7 @@ export class AuthService {
       name: data.name,
       email: data.email,
       password: hashedPassword,
-      role: data.role ?? Role.CUSTOMER,
+      role: data.role ?? Role.STUDENT,
       phone: data.phone,
     });
 

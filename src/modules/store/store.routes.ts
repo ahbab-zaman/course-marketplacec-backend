@@ -19,10 +19,10 @@ router.get("/", store.getPublicStores.bind(store));
 
 // ⚠️ IMPORTANT: /stores/me must be registered BEFORE /stores/:slug
 // `/me` would otherwise be captured as a slug parameter.
-// GET /stores/me — seller's own store (any status)
+// GET /stores/me — instructor's own store (legacy route, any status)
 router.get(
   "/me",
-  authorize(Role.SELLER),
+  authorize(Role.INSTRUCTOR),
   store.getMyStore.bind(store),
 );
 
@@ -33,7 +33,7 @@ router.get("/:slug", store.getStoreBySlug.bind(store));
 // POST /stores — create a new store
 router.post(
   "/",
-  authorize(Role.SELLER),
+  authorize(Role.INSTRUCTOR),
   storeUpload,
   store.createStore.bind(store),
 );
@@ -41,7 +41,7 @@ router.post(
 // PATCH /stores/:id — update own store
 router.patch(
   "/:id",
-  authorize(Role.SELLER),
+  authorize(Role.INSTRUCTOR),
   storeUpload,
   store.updateStore.bind(store),
 );
@@ -49,7 +49,7 @@ router.patch(
 // PATCH /stores/:id/toggle-open — open or close own store
 router.patch(
   "/:id/toggle-open",
-  authorize(Role.SELLER),
+  authorize(Role.INSTRUCTOR),
   store.toggleOpen.bind(store),
 );
 
