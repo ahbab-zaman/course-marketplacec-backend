@@ -71,11 +71,11 @@ if (process.env.NODE_ENV === "production") {
 // Home page route
 app.get("/", (_req: Request, res: Response) => {
   res.status(200).json({
-    title: "Welcome to your Express app",
+    title: "Course Marketplace Backend",
     description:
-      "Built with StackKit - A production-ready Express template with TypeScript, security, and best practices.",
+      "A modular Express and Prisma backend for a course marketplace platform.",
     version: "1.0.0",
-    docs: "https://github.com/tariqul420/stackkit",
+    docs: "/docs/backend-handbook.md",
   });
 });
 

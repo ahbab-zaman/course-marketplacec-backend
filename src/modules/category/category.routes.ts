@@ -1,11 +1,8 @@
 import { Router } from "express";
 import { CategoryController } from "./category.controller";
-import {
-  authenticate,
-  authorizeRoles,
-} from "../../middlewares/auth.middleware";
 import { Role } from "@prisma/client";
 import { createUploader } from "../../middlewares/upload.middleware";
+import authorize from "../../shared/middlewares/authorize.middleware";
 
 const router = Router();
 const categoryController = new CategoryController();
@@ -20,7 +17,7 @@ router.get("/:slug", categoryController.getCategoryBySlug);
 
 // ── Admin Routes ───────────────────────────────────────────────────────────
 // Rules: Only ADMIN can create, update, approve, reject, delete categories.
-router.use("/admin", authenticate, authorizeRoles(Role.ADMIN));
+router.use("/admin", authorize(Role.ADMIN));
 
 router.post("/admin", upload.single("icon"), categoryController.createCategory);
 

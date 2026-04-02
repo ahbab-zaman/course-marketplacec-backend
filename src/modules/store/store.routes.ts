@@ -1,10 +1,8 @@
 import { Router } from "express";
 import { StoreController } from "./store.controller";
-import { authenticate } from "../../middlewares/auth.middleware";
-import { authorizeRoles } from "../../middlewares/auth.middleware";
 import { Role } from "@prisma/client";
-
 import { upload } from "../../middlewares/upload.middleware";
+import authorize from "../../shared/middlewares/authorize.middleware";
 
 const router = Router();
 const store = new StoreController();
@@ -24,8 +22,7 @@ router.get("/", store.getPublicStores.bind(store));
 // GET /stores/me — seller's own store (any status)
 router.get(
   "/me",
-  authenticate,
-  authorizeRoles(Role.SELLER),
+  authorize(Role.SELLER),
   store.getMyStore.bind(store),
 );
 
@@ -36,8 +33,7 @@ router.get("/:slug", store.getStoreBySlug.bind(store));
 // POST /stores — create a new store
 router.post(
   "/",
-  authenticate,
-  authorizeRoles(Role.SELLER),
+  authorize(Role.SELLER),
   storeUpload,
   store.createStore.bind(store),
 );
@@ -45,8 +41,7 @@ router.post(
 // PATCH /stores/:id — update own store
 router.patch(
   "/:id",
-  authenticate,
-  authorizeRoles(Role.SELLER),
+  authorize(Role.SELLER),
   storeUpload,
   store.updateStore.bind(store),
 );
@@ -54,8 +49,7 @@ router.patch(
 // PATCH /stores/:id/toggle-open — open or close own store
 router.patch(
   "/:id/toggle-open",
-  authenticate,
-  authorizeRoles(Role.SELLER),
+  authorize(Role.SELLER),
   store.toggleOpen.bind(store),
 );
 
@@ -64,32 +58,28 @@ router.patch(
 // PATCH /stores/:id/approve — approve a PENDING store
 router.patch(
   "/:id/approve",
-  authenticate,
-  authorizeRoles(Role.ADMIN),
+  authorize(Role.ADMIN),
   store.approveStore.bind(store),
 );
 
 // PATCH /stores/:id/reject — reject a PENDING store
 router.patch(
   "/:id/reject",
-  authenticate,
-  authorizeRoles(Role.ADMIN),
+  authorize(Role.ADMIN),
   store.rejectStore.bind(store),
 );
 
 // PATCH /stores/:id/suspend — suspend any store
 router.patch(
   "/:id/suspend",
-  authenticate,
-  authorizeRoles(Role.ADMIN),
+  authorize(Role.ADMIN),
   store.suspendStore.bind(store),
 );
 
 // DELETE /stores/:id — soft delete a store
 router.delete(
   "/:id",
-  authenticate,
-  authorizeRoles(Role.ADMIN),
+  authorize(Role.ADMIN),
   store.softDeleteStore.bind(store),
 );
 

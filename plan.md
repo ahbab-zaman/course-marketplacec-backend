@@ -35,7 +35,25 @@ Implement phases in order unless a later phase is blocked on a dependency that m
 
 ## 1. Baseline Audit And Freeze
 
-**Status:** `[ ]`
+**Status:** `[x]`
+
+**Completed work:**
+
+- Reviewed the mounted API modules in `src/routes/index.ts`.
+- Confirmed the mixed auth runtime:
+  - custom JWT/cookie auth under `src/modules/auth`
+  - Better Auth mounted in `src/app.ts`
+  - separate authorization middleware paths
+- Reviewed Prisma schema composition across `prisma/schema`.
+- Reviewed startup behavior in `src/server.ts`, including automatic seed execution.
+- Confirmed the commerce modules targeted for retirement:
+  - `store`
+  - `product`
+  - `cart`
+  - current `category`
+- Confirmed the auth stacks targeted for consolidation:
+  - custom JWT flow
+  - Better Auth flow
 
 **Objective:**
 Document the current repo shape so all implementation work has a clear before-state.
@@ -82,7 +100,17 @@ Document the current repo shape so all implementation work has a clear before-st
 
 ## 2. Standardize Auth Foundation On Better Auth
 
-**Status:** `[ ]`
+**Status:** `[x]`
+
+**Completed work:**
+
+- Switched the currently mounted business routes to Better Auth-based authorization middleware.
+- Updated `src/shared/middlewares/authorize.middleware.ts` to:
+  - use Prisma `Role`
+  - load the Better Auth session
+  - reject blocked users
+- Removed `/api/v1/auth` from the active route aggregator in `src/routes/index.ts`.
+- Stopped using the custom JWT middleware in the mounted `store`, `category`, `product`, and `cart` routes.
 
 **Objective:**
 Remove mixed-auth behavior and make Better Auth the single auth standard for the platform.
@@ -127,7 +155,20 @@ Remove mixed-auth behavior and make Better Auth the single auth standard for the
 
 ## 3. Rename Platform Language And Defaults
 
-**Status:** `[ ]`
+**Status:** `[~]`
+
+**Completed work so far:**
+
+- Updated root API metadata in `src/app.ts` to identify the service as a course marketplace backend.
+- Rewrote `README.md` around the course-platform direction.
+- Rewrote `docs/backend-handbook.md` around the course platform architecture and rules.
+- Updated `.env.example` comments and examples toward Better Auth, Stripe, and video provider usage.
+
+**Remaining work in this phase:**
+
+- Replace runtime role naming from `SELLER`/`CUSTOMER` to `INSTRUCTOR`/`STUDENT`.
+- Update seed logic and remaining storefront wording in code comments and runtime messages.
+- Remove or rewrite any remaining storefront-specific dashboard/success messaging.
 
 **Objective:**
 Replace all active storefront terminology with course marketplace terminology.
@@ -160,7 +201,18 @@ Replace all active storefront terminology with course marketplace terminology.
 
 ## 4. Clean Startup And Config Conventions
 
-**Status:** `[ ]`
+**Status:** `[~]`
+
+**Completed work so far:**
+
+- Removed automatic database seeding from `src/server.ts`.
+- Updated `.env.example` with Stripe and video provider placeholders.
+
+**Remaining work in this phase:**
+
+- Align `src/config/env.ts` with the final Better Auth-only and course-platform config surface.
+- Remove JWT-only config once the legacy JWT flow is fully retired.
+- Add final env validation for Stripe and video provider settings when those modules land.
 
 **Objective:**
 Make startup deterministic and align configuration with the target platform.
@@ -921,4 +973,3 @@ Verify the final system end-to-end and use this file as the completion ledger.
 - [ ] Reviews enforce enrollment and uniqueness rules.
 - [ ] Admin summary/reporting endpoints return correct data.
 - [ ] Dead commerce and legacy auth code is removed.
-

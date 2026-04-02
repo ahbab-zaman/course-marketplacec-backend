@@ -1,16 +1,13 @@
 import { Router, Request, Response, NextFunction } from "express";
 import { CartController } from "./cart.controller";
-import {
-  authenticate,
-  authorizeRoles,
-} from "../../middlewares/auth.middleware";
 import { Role } from "@prisma/client";
+import authorize from "../../shared/middlewares/authorize.middleware";
 
 const router = Router();
 const cartController = new CartController();
 
 // All cart routes require authentication + CUSTOMER role
-router.use(authenticate, authorizeRoles(Role.CUSTOMER));
+router.use(authorize(Role.CUSTOMER));
 
 // ── Cart ─────────────────────────────────────────────────────────────────────
 

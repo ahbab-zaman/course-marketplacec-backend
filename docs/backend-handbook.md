@@ -1,124 +1,114 @@
-📘 BACKEND ENGINEERING HANDBOOK
-Multi-Vendor Grocery Marketplace
+# Backend Engineering Handbook
 
-🎯 Project Philosophy
+Course Marketplace Platform
+
+## Project Philosophy
 
 This backend must:
+
 - Be production-ready
-- Be scalable
 - Be secure
 - Be modular
-- Follow enterprise-level best practices
+- Be migration-friendly during the commerce-to-course cutover
+- Follow clear service and data boundaries
 
-The system must be built as if it will support 1M+ users.
+The target system is a course marketplace with instructor-owned content, student enrollments, protected lesson playback, and payment-backed access control.
 
-🏗 Architecture Standard
+## Architecture Standard
 
-We follow Modular Monolith Architecture.
+We use a modular monolith architecture.
 
-Each module contains:
+Each module should follow this structure:
 
+```text
 module/
- ├── controller.ts
- ├── service.ts
- ├── repository.ts
- ├── validator.ts
- ├── routes.ts
- └── types.ts
+  controller.ts
+  service.ts
+  repository.ts
+  validator.ts
+  routes.ts
+  types.ts
+```
 
-Controllers:
-- Handle request/response only.
+Rules:
 
-Services:
-- Contain business logic.
+- Controllers handle request/response only.
+- Services contain business logic.
+- Repositories contain Prisma queries only.
+- Shared middleware, shared errors, and shared response helpers should stay centralized.
 
-Repository:
-- Handle Prisma queries only.
+## Authentication Standard
 
-🔐 Authentication Standard
+- Better Auth is the platform auth standard.
+- Manual email/password auth and Google login must resolve to the same session model.
+- Protected routes must use Better Auth session lookup.
+- Role-based authorization is mandatory.
+- Unverified or blocked users must be rejected on protected routes where appropriate.
 
-- Access Token: 15 minutes
-- Refresh Token: 7 days
-- Refresh token rotation enabled
-- Sessions stored in database
-- OTP hashed before storage
-- Password hashed with bcrypt
-- Role-based authorization mandatory
+## Core Domain Direction
 
-💰 Financial Integrity Rules
+The target domain is:
 
-- Money calculations server-side only
-- Use transactions for:
-  - Order creation
-  - Payment verification
-  - Wallet updates
-- Commission deducted after delivery only
-- Refund must update wallet correctly
+- Users
+- Courses
+- Lessons
+- Enrollments
+- Payments
+- Reviews
+- Course categories
+- Lesson progress
 
-🛒 Order Lifecycle Rules
+The old store/product/cart domain is being retired.
 
-Allowed flow:
-PENDING → ACCEPTED → PREPARING → OUT_FOR_DELIVERY → DELIVERED
+## Payment And Access Rules
 
-Restrictions:
-- Cannot skip status
-- Cannot revert delivered
-- Only admin can override
+- Course access is granted only after trusted payment confirmation.
+- Stripe webhook handling must be signature-verified and idempotent.
+- Payment confirmation and enrollment creation must be transactional.
+- Students must not receive protected playback access without enrollment.
 
-🛡 Security Standards
+## Security Standards
 
 - Helmet middleware
 - CORS whitelist
 - Rate limiting
-- Centralized error handler
-- No raw error exposure
-- Lock account after 5 failed login attempts
-- Validate env variables at startup
+- Centralized error handling
+- Zod validation on all route inputs
+- No raw internal errors in production responses
+- Environment validation at startup
 
-📊 Performance Standards
+## Performance Standards
 
-- Pagination required
+- Pagination required for listing endpoints
 - Avoid N+1 queries
-- Add indexes for:
-  - email
-  - orderNumber
-  - foreign keys
-- Use select to reduce payload
-- Implement caching in future phase
+- Add indexes for slugs, foreign keys, Stripe identifiers, and progress lookups
+- Use explicit Prisma selects to limit payload size
 
-🧾 API Response Standard
+## API Response Standard
 
-All APIs must return:
+All APIs should use the shared response envelope:
 
+```json
 {
-  success: boolean,
-  message: string,
-  data?: object,
-  error?: object
+  "success": true,
+  "message": "Success",
+  "data": {},
+  "meta": {}
 }
+```
 
-No raw Prisma response allowed.
+Do not return raw Prisma payloads directly.
 
-🧠 Development Phases
+## Implementation Tracking
 
-1. Auth & RBAC
-2. Store module
-3. Product module
-4. Cart
-5. Order
-6. Payment
-7. Commission & Wallet
-8. Review
-9. Coupon
-10. Analytics
-11. Real-time
+The ordered execution checklist for the conversion lives in `plan.md`.
 
-🚀 Production Readiness Checklist
+## Production Readiness Checklist
 
 - All endpoints validated
-- All protected routes authenticated
-- Financial operations transactional
-- Indexes added
-- No sensitive fields exposed
-- Logs implemented
-- Environment validated
+- All protected routes authenticated and authorized
+- Payment and enrollment flows transactional
+- Required indexes added
+- Sensitive fields excluded from public responses
+- Operational logging added for money/access-critical flows
+- Environment documented and validated

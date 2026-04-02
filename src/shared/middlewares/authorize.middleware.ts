@@ -3,15 +3,10 @@ import { Role } from "@prisma/client";
 
 import { auth } from "../../modules/auth/auth";
 
-export enum UserRole {
-  USER = "USER",
-  ADMIN = "ADMIN",
-}
-
-const authorize = (...roles: UserRole[]) => {
+const authorize = (...roles: Role[]) => {
   return async (req: Request, res: Response, next: NextFunction) => {
     try {
-      // get user session
+      // Better Auth is the single runtime auth source for protected routes.
       const session = await auth?.api.getSession({
         headers: req.headers as any,
       });
@@ -39,10 +34,17 @@ const authorize = (...roles: UserRole[]) => {
         isBlocked: (session.user as any).isBlocked ?? false,
       };
 
+      if (req.user.isBlocked) {
+        return res.status(403).json({
+          success: false,
+          message: "Your account has been blocked.",
+        });
+      }
+
       if (
         roles.length &&
         req.user &&
-        !roles.includes(req.user.role as unknown as UserRole)
+        !roles.includes(req.user.role)
       ) {
         return res.status(403).json({
           success: false,

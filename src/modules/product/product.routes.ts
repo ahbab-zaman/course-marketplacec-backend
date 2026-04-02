@@ -1,11 +1,8 @@
 import { Router } from "express";
 import { ProductController } from "./product.controller";
-import {
-  authenticate,
-  authorizeRoles,
-} from "../../middlewares/auth.middleware";
 import { Role } from "@prisma/client";
 import { createUploader } from "../../middlewares/upload.middleware";
+import authorize from "../../shared/middlewares/authorize.middleware";
 
 const router = Router();
 const productController = new ProductController();
@@ -24,7 +21,7 @@ router.get("/:slug", productController.getProductBySlug);
 
 // ── Seller Routes ────────────────────────────────────────────────────────────
 const sellerRouter = Router();
-sellerRouter.use(authenticate, authorizeRoles(Role.SELLER));
+sellerRouter.use(authorize(Role.SELLER));
 
 // Products
 sellerRouter.get("/me", productController.getSellerProducts);
@@ -54,7 +51,7 @@ router.use("/seller", sellerRouter);
 
 // ── Admin Routes ─────────────────────────────────────────────────────────────
 const adminRouter = Router();
-adminRouter.use(authenticate, authorizeRoles(Role.ADMIN));
+adminRouter.use(authorize(Role.ADMIN));
 
 adminRouter.get("/all", productController.getAllAdminProducts);
 adminRouter.get("/:id", productController.getAdminProductById);
