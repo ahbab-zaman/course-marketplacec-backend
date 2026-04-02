@@ -11,6 +11,9 @@ import { toNodeHandler } from "better-auth/node";
 
 import cookieParser from "cookie-parser";
 
+const APP_NAME = "Course Marketplace Backend";
+const API_VERSION = "v1";
+
 // app initialization
 const app: Application = express();
 
@@ -19,6 +22,7 @@ const app: Application = express();
 // for toNodeHandler which needs to read the body itself.
 app.all("/api/auth/*splat", (req: Request, res: Response) => {
   if (!auth) {
+    console.warn("[auth] Better Auth request received before initialization");
     return res.status(503).json({ success: false, message: "Auth not ready" });
   }
   return toNodeHandler(auth)(req, res);
@@ -71,10 +75,12 @@ if (process.env.NODE_ENV === "production") {
 // Home page route
 app.get("/", (_req: Request, res: Response) => {
   res.status(200).json({
-    title: "Course Marketplace Backend",
+    title: APP_NAME,
     description:
       "A modular Express and Prisma backend for a course marketplace platform.",
     version: "1.0.0",
+    apiVersion: API_VERSION,
+    status: "running",
     docs: "/docs/backend-handbook.md",
   });
 });

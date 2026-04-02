@@ -1,41 +1,47 @@
-// Store Model
-model Store {
-  id          String  @id @default(uuid())
-  name        String
-  slug        String  @unique
-  description String?
-  logo        String?
-  banner      String?
+model CourseCategory {
+  id       String  @id @default(uuid())
+  name     String
+  slug     String  @unique
+  isActive Boolean @default(true)
 
-  // Owner
-  sellerId String
-  seller   User      @relation(fields: [sellerId], references: [id])
-  products Product[]
-  carts    Cart[]    // Carts currently scoped to this store
+  courses   Course[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  // Status & Visibility
-  status StoreStatus @default(PENDING)
-  isOpen Boolean     @default(false)
+  @@map("course_categories")
+}
 
-  // Operational
-  deliveryRadiusKm Float
-  minimumOrder     Float
+model Course {
+  id               String       @id @default(uuid())
+  instructorId     String
+  categoryId       String?
+  title            String
+  slug             String       @unique
+  shortDescription String?
+  description      String
+  thumbnail        String?
+  price            Float
+  status           CourseStatus @default(DRAFT)
+  submittedAt      DateTime?
+  publishedAt      DateTime?
+  rejectionReason  String?
+  avgRating        Float        @default(0)
+  totalReviews     Int          @default(0)
+  enrollmentCount  Int          @default(0)
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+  deletedAt        DateTime?
 
-  // Location
-  address   String
-  latitude  Float
-  longitude Float
+  instructor  User            @relation(fields: [instructorId], references: [id])
+  category    CourseCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  lessons     Lesson[]
+  enrollments Enrollment[]
+  payments    Payment[]
+  reviews     Review[]
 
-  // Business Hours
-  openingTime String // HH:mm
-  closingTime String // HH:mm
-
-  // Timestamps
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  deletedAt DateTime? // Soft delete — never hard delete
-
-  @@index([sellerId])
+  @@index([instructorId])
   @@index([status])
-  @@map("store")
+  @@index([categoryId, status])
+  @@index([deletedAt])
+  @@map("courses")
 }

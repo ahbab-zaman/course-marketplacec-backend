@@ -1,8 +1,8 @@
 // User Role Enum
 enum Role {
   ADMIN
-  SELLER
-  CUSTOMER
+  INSTRUCTOR
+  STUDENT
 }
 
 // Auth Provider Enum
@@ -19,31 +19,29 @@ enum OtpType {
 }
 
 // Store Status Enum
-enum StoreStatus {
-  PENDING
-  APPROVED
-  SUSPENDED
-  REJECTED
-}
-
-// Category Status Enum
-enum CategoryStatus {
-  PENDING
-  APPROVED
-  REJECTED
-}
-
-// Product Status Enum
-enum ProductStatus {
+enum CourseStatus {
   DRAFT
-  PENDING
+  PENDING_REVIEW
   PUBLISHED
+  REJECTED
   ARCHIVED
 }
 
-// Attribute Type Enum
-enum AttributeType {
-  TEXT
-  COLOR_SWATCH
-  DROPDOWN
+enum EnrollmentStatus {
+  ACTIVE
+  REFUNDED
+  REVOKED
+}
+
+enum PaymentStatus {
+  PENDING
+  SUCCEEDED
+  FAILED
+  REFUNDED
+}
+
+enum VideoProvider {
+  CLOUDFLARE_STREAM
+  MUX
+  BUNNY_STREAM
 }

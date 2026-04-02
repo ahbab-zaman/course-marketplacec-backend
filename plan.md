@@ -250,7 +250,36 @@ Make startup deterministic and align configuration with the target platform.
 
 ## 5. Replace Prisma Enums And User Relations
 
-**Status:** `[ ]`
+**Status:** `[~]`
+
+**Completed work so far:**
+
+- Updated Prisma role enum in `prisma/schema/enums.prisma` to the target course roles:
+  - `ADMIN`
+  - `INSTRUCTOR`
+  - `STUDENT`
+- Replaced commerce enums in `prisma/schema/enums.prisma` with course-domain enums:
+  - `CourseStatus`
+  - `EnrollmentStatus`
+  - `PaymentStatus`
+  - `VideoProvider`
+- Updated `prisma/schema/user.prisma` so `User` now defaults to `STUDENT`.
+- Reworked `User` relations in `prisma/schema/user.prisma` toward:
+  - `authoredCourses`
+  - `enrollments`
+  - `lessonProgress`
+  - `reviews`
+  - `payments`
+- Replaced the active commerce schema files with course-domain schema definitions in:
+  - `prisma/schema/store.prisma`
+  - `prisma/schema/product.prisma`
+  - `prisma/schema/cart.prisma`
+
+**Remaining work in this phase:**
+
+- Align the runtime TypeScript codebase with the new Prisma role names after Prisma client regeneration.
+- Verify the final Prisma schema with `prisma validate` and `prisma generate` once local Prisma engine access is available.
+- Complete any auth/service/seed/runtime references that still use `SELLER` and `CUSTOMER`.
 
 **Objective:**
 Move Prisma types from the commerce domain to the course domain while preserving Better Auth compatibility.

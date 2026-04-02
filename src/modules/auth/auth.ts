@@ -25,7 +25,7 @@ export async function initAuth() {
       additionalFields: {
         role: {
           type: "string",
-          defaultValue: "CUSTOMER",
+          defaultValue: "STUDENT",
           required: true,
         },
       },

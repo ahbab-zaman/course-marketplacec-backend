@@ -5,7 +5,7 @@ model User {
   email    String  @unique
   phone    String?
   password String? // Nullable for Google users
-  role     Role    @default(CUSTOMER)
+  role     Role    @default(STUDENT)
 
   // Auth & Security
   isEmailVerified     Boolean   @default(false)
@@ -22,11 +22,13 @@ model User {
   updatedAt DateTime @updatedAt
 
   // Relations
-  sessions   Session[]
-  accounts   Account[] // Kept for flexibility/Better Auth default
-  stores     Store[]    // A seller can have multiple stores
-  categories Category[]
-  cart       Cart?      // One active cart per customer
+  sessions        Session[]
+  accounts        Account[] // Kept for Better Auth/OAuth support
+  authoredCourses Course[]
+  enrollments     Enrollment[]
+  lessonProgress  LessonProgress[]
+  reviews         Review[]
+  payments        Payment[]
 
   @@map("user")
 }
