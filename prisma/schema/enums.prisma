@@ -1,0 +1,49 @@
+// User Role Enum
+enum Role {
+  ADMIN
+  SELLER
+  CUSTOMER
+}
+
+// Auth Provider Enum
+enum AuthProvider {
+  LOCAL
+  GOOGLE
+}
+
+// OTP Type Enum
+enum OtpType {
+  VERIFY_EMAIL
+  LOGIN
+  RESET_PASSWORD
+}
+
+// Store Status Enum
+enum StoreStatus {
+  PENDING
+  APPROVED
+  SUSPENDED
+  REJECTED
+}
+
+// Category Status Enum
+enum CategoryStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+// Product Status Enum
+enum ProductStatus {
+  DRAFT
+  PENDING
+  PUBLISHED
+  ARCHIVED
+}
+
+// Attribute Type Enum
+enum AttributeType {
+  TEXT
+  COLOR_SWATCH
+  DROPDOWN
+}
