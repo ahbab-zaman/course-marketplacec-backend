@@ -13,13 +13,5 @@
     "resolveJsonModule": true
   },
   "include": ["src/**/*"],
-  "exclude": [
-    "node_modules",
-    "dist",
-    "src/modules/store/**/*",
-    "src/modules/product/**/*",
-    "src/modules/cart/**/*",
-    "src/modules/category/**/*",
-    "src/middlewares/auth.middleware.ts"
-  ]
+  "exclude": ["node_modules", "dist", "src/middlewares/auth.middleware.ts"]
 }

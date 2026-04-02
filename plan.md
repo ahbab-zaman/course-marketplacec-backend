@@ -283,7 +283,6 @@ Make startup deterministic and align configuration with the target platform.
 **Remaining work in this phase:**
 
 - Complete leftover legacy comments and retired-code references that still mention `SELLER` and `CUSTOMER`.
-- Remove the remaining legacy commerce modules instead of only excluding them from TypeScript compilation.
 
 **Objective:**
 Move Prisma types from the commerce domain to the course domain while preserving Better Auth compatibility.
@@ -329,12 +328,14 @@ Move Prisma types from the commerce domain to the course domain while preserving
 - Replaced the commerce Prisma models with course-domain models in the schema files.
 - Retired cart schema definitions from the active datamodel.
 - Unmounted the legacy commerce routes from `src/routes/index.ts` so the active API surface no longer exposes them.
-- Temporarily excluded retired commerce modules from `tsconfig.json` so the active application can compile during the cutover.
+- Removed the legacy commerce module source files from `src/modules/store`, `src/modules/product`, `src/modules/cart`, and `src/modules/category`.
+- Added the first replacement course-platform routes:
+  - `users`
+  - `categories`
 
 **Remaining work in this phase:**
 
 - Introduce the new course-platform modules and routes to replace the retired commerce modules.
-- Remove the retired commerce source files instead of only excluding them from compilation.
 - Align the remaining app code to the new course-domain data model.
 
 **Objective:**
@@ -472,7 +473,21 @@ Generate a safe, executable Prisma migration path for the course-domain cutover.
 
 ## 8. Build Shared Course-Domain Conventions
 
-**Status:** `[ ]`
+**Status:** `[~]`
+
+**Completed work so far:**
+
+- Fixed the shared error middleware so `ApiError.statusCode` is now respected.
+- Added the first live course-domain modules:
+  - `user`
+  - `course-category`
+- Wired the active API surface to the new routes in `src/routes/index.ts`.
+- Kept the shared pagination and response helpers in use for the first replacement modules.
+
+**Remaining work in this phase:**
+
+- Add shared course-domain helpers for ownership checks, course queries, and public/protected selects.
+- Standardize more query parsing and response shaping as additional modules are introduced.
 
 **Objective:**
 Create shared conventions so all new modules behave consistently.
@@ -506,7 +521,20 @@ Create shared conventions so all new modules behave consistently.
 
 ## 9. Implement User Module
 
-**Status:** `[ ]`
+**Status:** `[~]`
+
+**Completed work so far:**
+
+- Added `GET /api/v1/users/me`.
+- Added `PATCH /api/v1/users/me`.
+- Added `GET /api/v1/users/me/learning`.
+- Protected all user routes with Better Auth authorization middleware.
+- Added repository/service/controller/validator/types/routes structure for the `user` module.
+
+**Remaining work in this phase:**
+
+- Expand the learning summary once course, lesson, and playback modules are implemented.
+- Add any extra account endpoints that are needed after the main course flow lands.
 
 **Objective:**
 Add authenticated account endpoints needed for the course platform.
@@ -534,7 +562,19 @@ Add authenticated account endpoints needed for the course platform.
 
 ## 10. Implement Course Category Module
 
-**Status:** `[ ]`
+**Status:** `[~]`
+
+**Completed work so far:**
+
+- Added a simple `course-category` module.
+- Added public list/detail endpoints for course categories.
+- Added admin list/create/update endpoints for course categories.
+- Added repository/service/controller/validator/types/routes structure for the `course-category` module.
+
+**Remaining work in this phase:**
+
+- Expand category management if moderation or richer taxonomy rules are needed later.
+- Integrate category filtering into the upcoming course module.
 
 **Objective:**
 Add a simple category taxonomy for courses.
@@ -811,7 +851,26 @@ Add admin moderation and platform reporting endpoints.
 
 ## 18. Replace Route Aggregator
 
-**Status:** `[ ]`
+**Status:** `[~]`
+
+**Completed work so far:**
+
+- Removed the old commerce route registrations from `src/routes/index.ts`.
+- Added the first course-platform route registrations:
+  - `user`
+  - `course-category`
+- Kept `/api/v1` as the active business API namespace.
+- Better Auth remains mounted under `/api/auth/*`.
+
+**Remaining work in this phase:**
+
+- Add the remaining course-platform routes as their modules are built:
+  - `course`
+  - `lesson`
+  - `enrollment`
+  - `payment`
+  - `review`
+  - `admin`
 
 **Objective:**
 Switch the active business route surface from commerce routes to course-platform routes.
@@ -925,7 +984,17 @@ Harden validation, RBAC, sensitive data handling, and operational visibility.
 
 ## 21. Final Cleanup
 
-**Status:** `[ ]`
+**Status:** `[~]`
+
+**Completed work so far:**
+
+- Removed the retired commerce source files from the repo working tree.
+- Eliminated the need for TypeScript to exclude the retired commerce modules.
+
+**Remaining work in this phase:**
+
+- Remove leftover storefront comments and wording in remaining auth/runtime files.
+- Remove the old custom JWT implementation once it is no longer needed by any active code path.
 
 **Objective:**
 Remove dead commerce and legacy auth code so the codebase reflects one coherent platform.

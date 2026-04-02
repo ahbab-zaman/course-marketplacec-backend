@@ -1,5 +1,7 @@
 import { Router } from "express";
 import { healthRoutes } from "../modules/health/health.route";
+import userRoutes from "../modules/user/user.routes";
+import courseCategoryRoutes from "../modules/course-category/course-category.routes";
 
 const router = Router();
 
@@ -7,6 +9,8 @@ const router = Router();
 const v1 = Router();
 
 v1.use("/health", healthRoutes);
+v1.use("/users", userRoutes);
+v1.use("/categories", courseCategoryRoutes);
 
 router.use("/v1", v1);
 

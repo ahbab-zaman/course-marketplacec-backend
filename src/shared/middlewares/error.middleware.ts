@@ -4,6 +4,7 @@ import { ZodError } from "zod";
 
 type ErrorWithStatus = {
   status?: number;
+  statusCode?: number;
   message?: string;
   stack?: string;
 };
@@ -15,7 +16,10 @@ function isObject(value: unknown): value is Record<string, unknown> {
 function getErrorStatus(err: unknown): number {
   if (!isObject(err)) return 500;
   const status = err["status"];
-  return typeof status === "number" ? status : 500;
+  if (typeof status === "number") return status;
+
+  const statusCode = err["statusCode"];
+  return typeof statusCode === "number" ? statusCode : 500;
 }
 
 function getErrorMessage(err: unknown): string {
