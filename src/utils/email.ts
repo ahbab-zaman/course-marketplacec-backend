@@ -1,5 +1,7 @@
 import nodemailer from "nodemailer";
 import { env } from "../config/env";
+import { getVerificationOtpEmailTemplate } from "../shared/email/email-templates";
+import { authRepository } from "../modules/auth/auth.repository";
 
 const transporter = nodemailer.createTransport({
   host: env.email.host,
@@ -28,14 +30,11 @@ export const sendEmail = async (to: string, subject: string, html: string) => {
 };
 
 export const sendOTPEmail = async (email: string, otp: string) => {
-  const subject = "Verification Code - StoreFront";
-  const html = `
-    <div style="font-family: Arial, sans-serif; padding: 20px;">
-      <h2>Verify your email</h2>
-      <p>Your verification code is:</p>
-      <h1 style="color: #4CAF50; letter-spacing: 5px;">${otp}</h1>
-      <p>This code will expire in 5 minutes.</p>
-    </div>
-  `;
-  return await sendEmail(email, subject, html);
+  const user = await authRepository.findUserByEmail(email);
+  const { html } = getVerificationOtpEmailTemplate(
+    { name: user?.name, email },
+    otp,
+  );
+
+  return await sendEmail(email, "Verification Code - Course Marketplace", html);
 };

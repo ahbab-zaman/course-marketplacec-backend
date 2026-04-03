@@ -126,4 +126,34 @@ export class AuthController {
       return next(err);
     }
   }
+
+  async verifyEmail(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { email, otp } = otpSchema.parse({
+        ...req.body,
+        type: OtpType.VERIFY_EMAIL,
+      });
+      const result = await authService.verifyOTP(email, otp, OtpType.VERIFY_EMAIL);
+      return success(res, result, "Email verified successfully");
+    } catch (err) {
+      return next(err);
+    }
+  }
+
+  async resendVerificationEmail(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ) {
+    try {
+      const { email } = resendOtpSchema.parse({
+        ...req.body,
+        type: OtpType.VERIFY_EMAIL,
+      });
+      const result = await authService.resendOTP(email, OtpType.VERIFY_EMAIL);
+      return success(res, result, "Verification OTP sent successfully");
+    } catch (err) {
+      return next(err);
+    }
+  }
 }

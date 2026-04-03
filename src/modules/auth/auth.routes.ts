@@ -22,6 +22,12 @@ router.get(
 
 // ── Email / Password ──────────────────────────────────────────────────────────
 router.post("/register", authLimiter, authController.register);
+router.post("/verify-email", authController.verifyEmail.bind(authController));
+router.post(
+  "/resend-verification",
+  authLimiter,
+  authController.resendVerificationEmail.bind(authController),
+);
 router.post("/verify-otp", authController.verifyOTP);
 router.post("/resend-otp", authLimiter, authController.resendOTP);
 router.post("/login", authLimiter, authController.login);

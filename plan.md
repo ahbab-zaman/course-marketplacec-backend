@@ -111,6 +111,11 @@ Document the current repo shape so all implementation work has a clear before-st
   - reject blocked users
 - Removed `/api/v1/auth` from the active route aggregator in `src/routes/index.ts`.
 - Stopped using the custom JWT middleware in the mounted `store`, `category`, `product`, and `cart` routes.
+- Restored dedicated OTP verification endpoints for signup under `/api/v1/auth` while keeping protected business routes on Better Auth session authorization.
+- Added explicit signup verification routes:
+  - `POST /api/v1/auth/register`
+  - `POST /api/v1/auth/verify-email`
+  - `POST /api/v1/auth/resend-verification`
 
 **Objective:**
 Remove mixed-auth behavior and make Better Auth the single auth standard for the platform.
@@ -163,6 +168,7 @@ Remove mixed-auth behavior and make Better Auth the single auth standard for the
 - Rewrote `README.md` around the course-platform direction.
 - Rewrote `docs/backend-handbook.md` around the course platform architecture and rules.
 - Updated `.env.example` comments and examples toward Better Auth, Stripe, and video provider usage.
+- Replaced the old storefront OTP email markup with a course-platform verification OTP template using the shared email-template system.
 
 **Remaining work in this phase:**
 
@@ -894,6 +900,7 @@ Add admin moderation and platform reporting endpoints.
 
 - Removed the old commerce route registrations from `src/routes/index.ts`.
 - Added the first course-platform route registrations:
+  - `auth`
   - `user`
   - `course-category`
   - `course`
