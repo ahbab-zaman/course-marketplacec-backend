@@ -232,7 +232,7 @@
               "raw": "{\n  \"email\": \"student@example.com\",\n  \"password\": \"StrongPassword123!\"\n}"
             },
             "url": {
-              "raw": "{{baseUrl}}/api/auth/sign-in/email",
+              "raw": "{{baseUrl}}{{apiPrefix}}/auth/login",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -268,7 +268,7 @@
             "header": [],
             "description": "Inspect the current Better Auth session after sign-in.",
             "url": {
-              "raw": "{{baseUrl}}/api/auth/get-session",
+              "raw": "{{baseUrl}}{{apiPrefix}}/auth/get-session",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -288,7 +288,7 @@
             "header": [],
             "description": "Terminate the current Better Auth session.",
             "url": {
-              "raw": "{{baseUrl}}/api/auth/sign-out",
+              "raw": "{{baseUrl}}{{apiPrefix}}/auth/logout",
               "host": [
                 "{{baseUrl}}"
               ],
