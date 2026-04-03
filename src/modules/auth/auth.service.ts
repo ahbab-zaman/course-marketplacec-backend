@@ -23,7 +23,7 @@ export class AuthService {
 
     const hashedPassword = await hashValue(data.password);
 
-    const user = await authRepository.createUser({
+    const user = await authRepository.createUserWithCredentialAccount({
       name: data.name,
       email: data.email,
       password: hashedPassword,

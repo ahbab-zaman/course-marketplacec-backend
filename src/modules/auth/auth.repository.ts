@@ -7,6 +7,7 @@ export type CreateUserInput = {
   password: string;
   role: Role;
   phone?: string;
+  isEmailVerified?: boolean;
 };
 
 export type CreateSessionInput = {
@@ -30,6 +31,15 @@ export class AuthRepository {
     return prisma.user.findUnique({ where: { email } });
   }
 
+  findCredentialAccountByUserId(userId: string) {
+    return prisma.account.findFirst({
+      where: {
+        userId,
+        providerId: "credential",
+      },
+    });
+  }
+
   createUser(data: CreateUserInput) {
     return prisma.user.create({
       data: {
@@ -39,6 +49,58 @@ export class AuthRepository {
         role: data.role,
         phone: data.phone,
         provider: "LOCAL",
+        isEmailVerified: data.isEmailVerified ?? false,
+      },
+    });
+  }
+
+  async createUserWithCredentialAccount(data: CreateUserInput) {
+    return prisma.$transaction(async (tx) => {
+      const user = await tx.user.create({
+        data: {
+          name: data.name,
+          email: data.email,
+          password: data.password,
+          role: data.role,
+          phone: data.phone,
+          provider: "LOCAL",
+          isEmailVerified: data.isEmailVerified ?? false,
+        },
+      });
+
+      await tx.account.create({
+        data: {
+          userId: user.id,
+          accountId: user.id,
+          providerId: "credential",
+          password: data.password,
+        },
+      });
+
+      return user;
+    });
+  }
+
+  async syncCredentialAccount(userId: string, passwordHash: string) {
+    const existing = await this.findCredentialAccountByUserId(userId);
+
+    if (existing) {
+      return prisma.account.update({
+        where: { id: existing.id },
+        data: {
+          password: passwordHash,
+          accountId: userId,
+          providerId: "credential",
+        },
+      });
+    }
+
+    return prisma.account.create({
+      data: {
+        userId,
+        accountId: userId,
+        providerId: "credential",
+        password: passwordHash,
       },
     });
   }
@@ -144,4 +206,3 @@ export class AuthRepository {
 }
 
 export const authRepository = new AuthRepository();
-

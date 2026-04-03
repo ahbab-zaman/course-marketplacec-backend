@@ -2,13 +2,11 @@ import "dotenv/config";
 import { PrismaClient, Role } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import pg from "pg";
-import bcrypt from "bcrypt";
+import { hashValue } from "../src/utils/hash";
 
 const pool = new pg.Pool({ connectionString: process.env.DATABASE_URL });
 const adapter = new PrismaPg(pool);
 const prisma = new PrismaClient({ adapter });
-
-const SALT_ROUNDS = 10;
 
 interface SeedUser {
   name: string;
@@ -68,22 +66,76 @@ export async function runSeeder(): Promise<void> {
       });
 
       if (existing) {
-        log.skip(`${user.role} already exists -> ${user.email}`);
+        const hashedPassword = await hashValue(user.password);
+
+        await prisma.user.update({
+          where: { id: existing.id },
+          data: {
+            name: user.name,
+            password: hashedPassword,
+            role: user.role,
+            provider: "LOCAL",
+            isEmailVerified: true,
+          },
+        });
+
+        const existingAccount = await prisma.account.findFirst({
+          where: {
+            userId: existing.id,
+            providerId: "credential",
+          },
+          select: { id: true },
+        });
+
+        if (existingAccount) {
+          await prisma.account.update({
+            where: { id: existingAccount.id },
+            data: {
+              accountId: existing.id,
+              providerId: "credential",
+              password: hashedPassword,
+            },
+          });
+        } else {
+          await prisma.account.create({
+            data: {
+              userId: existing.id,
+              accountId: existing.id,
+              providerId: "credential",
+              password: hashedPassword,
+            },
+          });
+        }
+
+        log.success(`Synced ${user.role} auth account -> ${user.email}`);
         continue;
       }
 
-      const hashedPassword = await bcrypt.hash(user.password, SALT_ROUNDS);
+      const hashedPassword = await hashValue(user.password);
 
-      const created = await prisma.user.create({
-        data: {
-          name: user.name,
-          email: user.email,
-          password: hashedPassword,
-          role: user.role,
-          provider: "LOCAL",
-          isEmailVerified: true,
-        },
-        select: { id: true, email: true, role: true },
+      const created = await prisma.$transaction(async (tx) => {
+        const createdUser = await tx.user.create({
+          data: {
+            name: user.name,
+            email: user.email,
+            password: hashedPassword,
+            role: user.role,
+            provider: "LOCAL",
+            isEmailVerified: true,
+          },
+          select: { id: true, email: true, role: true },
+        });
+
+        await tx.account.create({
+          data: {
+            userId: createdUser.id,
+            accountId: createdUser.id,
+            providerId: "credential",
+            password: hashedPassword,
+          },
+        });
+
+        return createdUser;
       });
 
       log.success(`Created ${created.role} -> ${created.email}`);

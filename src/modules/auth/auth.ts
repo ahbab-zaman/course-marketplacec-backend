@@ -7,6 +7,7 @@ import {
 import { prisma } from "../../database/prisma";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { env } from "../../config/env";
+import { compareValue, hashValue } from "../../utils/hash";
 
 export async function initAuth() {
   return betterAuth({
@@ -42,6 +43,12 @@ export async function initAuth() {
           html,
         });
       },
+      password: {
+        hash: async (password) => hashValue(password),
+        verify: async ({ hash, password }) =>
+          compareValue(password, hash),
+      },
+      autoSignIn: false,
     },
     socialProviders: {
       google: {
@@ -61,6 +68,7 @@ export async function initAuth() {
           html,
         });
       },
+      sendOnSignUp: false,
       sendOnSignIn: true,
       autoSignInAfterVerification: true,
     },
