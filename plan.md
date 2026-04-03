@@ -600,7 +600,44 @@ Add a simple category taxonomy for courses.
 
 ## 11. Implement Course Module
 
-**Status:** `[ ]`
+**Status:** `[~]`
+
+**Completed work so far:**
+
+- Added a full `course` module in the standard layered pattern:
+  - repository
+  - service
+  - controller
+  - validator
+  - types
+  - routes
+- Added public course endpoints:
+  - `GET /api/v1/courses`
+  - `GET /api/v1/courses/:slugOrId`
+- Added instructor/admin-managed course endpoints:
+  - `POST /api/v1/courses`
+  - `GET /api/v1/courses/me`
+  - `PATCH /api/v1/courses/:id`
+  - `DELETE /api/v1/courses/:id`
+  - `POST /api/v1/courses/:id/submit`
+- Implemented course query features:
+  - pagination
+  - search
+  - category filter
+  - instructor filter
+  - price range filter
+  - sorting
+- Implemented slug generation with uniqueness handling in the service layer.
+- Enforced public visibility rules so public course endpoints return only published, non-deleted courses.
+- Enforced ownership rules so instructors can only mutate their own courses.
+- Added mutation restrictions so non-admin instructors can update or delete only draft/rejected courses.
+- Added submit-for-review transition from `DRAFT`/`REJECTED` to `PENDING_REVIEW`.
+
+**Remaining work in this phase:**
+
+- Add admin moderation actions for publish, reject, and archive in the upcoming admin phase.
+- Expand course detail shaping with lessons/review context after the lesson and review modules land.
+- Revisit course submission completeness rules after lesson creation is available.
 
 **Objective:**
 Build the core course catalog and instructor course management flow.
@@ -859,6 +896,7 @@ Add admin moderation and platform reporting endpoints.
 - Added the first course-platform route registrations:
   - `user`
   - `course-category`
+  - `course`
 - Kept `/api/v1` as the active business API namespace.
 - Better Auth remains mounted under `/api/auth/*`.
 
