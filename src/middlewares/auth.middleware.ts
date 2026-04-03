@@ -3,41 +3,55 @@ import { verifyAccessToken } from "../utils/token";
 import { prisma } from "../database/prisma";
 import { Role } from "@prisma/client";
 
+export async function getRequestUserFromBearerToken(req: Request) {
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return null;
+  }
+
+  const token = authHeader.split(" ")[1];
+  const decoded = verifyAccessToken(token);
+
+  if (!decoded) {
+    return null;
+  }
+
+  const user = await prisma.user.findUnique({
+    where: { id: decoded.userId },
+    select: {
+      id: true,
+      role: true,
+      email: true,
+      name: true,
+      isBlocked: true,
+      isEmailVerified: true,
+    },
+  });
+
+  if (!user || user.isBlocked) {
+    return null;
+  }
+
+  return {
+    id: user.id,
+    role: user.role,
+    email: user.email,
+    name: user.name,
+    isEmailVerified: user.isEmailVerified,
+    isBlocked: user.isBlocked,
+  };
+}
+
 export const authenticate = async (
   req: Request,
   res: Response,
   next: NextFunction,
 ) => {
   try {
-    const authHeader = req.headers.authorization;
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    const user = await getRequestUserFromBearerToken(req);
+
+    if (!user) {
       return res.status(401).json({ error: "Unauthorized: Missing token" });
-    }
-
-    const token = authHeader.split(" ")[1];
-    const decoded = verifyAccessToken(token);
-
-    if (!decoded) {
-      return res.status(401).json({ error: "Unauthorized: Invalid token" });
-    }
-
-    // Verify user exists and is active
-    const user = await prisma.user.findUnique({
-      where: { id: decoded.userId },
-      select: {
-        id: true,
-        role: true,
-        email: true,
-        name: true,
-        isBlocked: true,
-        isEmailVerified: true,
-      },
-    });
-
-    if (!user || user.isBlocked) {
-      return res
-        .status(401)
-        .json({ error: "Unauthorized: User not found or blocked" });
     }
 
     req.user = {

@@ -74,8 +74,11 @@ export class AuthController {
         maxAge: 7 * 24 * 60 * 60 * 1000,
       });
 
-      // Do not return tokens in JSON responses (httpOnly cookies only)
-      return success(res, { user }, "Login successful");
+      return success(
+        res,
+        { user, accessToken, refreshToken },
+        "Login successful",
+      );
     } catch (err) {
       return next(err);
     }
@@ -104,7 +107,14 @@ export class AuthController {
         maxAge: 7 * 24 * 60 * 60 * 1000,
       });
 
-      return success(res, {}, "Token refreshed successfully");
+      return success(
+        res,
+        {
+          accessToken: result.accessToken,
+          refreshToken: result.refreshToken,
+        },
+        "Token refreshed successfully",
+      );
     } catch (err) {
       return next(err);
     }

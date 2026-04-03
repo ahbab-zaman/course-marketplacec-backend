@@ -42,6 +42,11 @@
       "type": "string"
     },
     {
+      "key": "lessonId",
+      "value": "",
+      "type": "string"
+    },
+    {
       "key": "accessToken",
       "value": "",
       "type": "string"
@@ -306,8 +311,11 @@
                 "exec": [
                   "if (pm.response.code === 200) {",
                   "  const body = pm.response.json();",
-                  "  const user = body?.data?.user;",
+                  "  const payload = body?.data || {};",
+                  "  const user = payload.user;",
                   "  if (user?.id) pm.collectionVariables.set('userId', user.id);",
+                  "  if (payload.accessToken) pm.collectionVariables.set('accessToken', payload.accessToken);",
+                  "  if (payload.refreshToken) pm.collectionVariables.set('refreshToken', payload.refreshToken);",
                   "}"
                 ]
               }
@@ -321,7 +329,7 @@
                 "value": "application/json"
               }
             ],
-            "description": "Compatibility login route under /api/v1/auth. This sets custom accessToken and refreshToken cookies. It is not the recommended session path for protected course-platform business endpoints.",
+            "description": "Legacy token login route under /api/v1/auth.\n\nThis now returns `accessToken` and `refreshToken` in the response body and the collection saves them into collection variables automatically. The active authorization middleware also accepts `Authorization: Bearer {{accessToken}}`, so you do not need to paste tokens manually after this request.",
             "body": {
               "mode": "raw",
               "raw": "{\n  \"email\": \"student@example.com\",\n  \"password\": \"StrongPassword123!\"\n}"
@@ -342,10 +350,38 @@
         },
         {
           "name": "Auth - Legacy Refresh Token",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const refreshToken = pm.collectionVariables.get('refreshToken');",
+                  "if (refreshToken) {",
+                  "  pm.cookies.jar().set(pm.request.url, 'refreshToken', refreshToken, function () {});",
+                  "}"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  const body = pm.response.json();",
+                  "  const payload = body?.data || {};",
+                  "  if (payload.accessToken) pm.collectionVariables.set('accessToken', payload.accessToken);",
+                  "  if (payload.refreshToken) pm.collectionVariables.set('refreshToken', payload.refreshToken);",
+                  "}"
+                ]
+              }
+            }
+          ],
           "request": {
             "method": "POST",
             "header": [],
-            "description": "Compatibility refresh route. Requires the custom refreshToken cookie issued by Auth - Legacy Login.",
+            "description": "Legacy refresh route. Uses the stored `refreshToken` variable to refresh tokens automatically and then updates the collection variables.",
             "url": {
               "raw": "{{baseUrl}}{{apiPrefix}}/auth/refresh",
               "host": [
@@ -362,10 +398,36 @@
         },
         {
           "name": "Auth - Legacy Logout",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const refreshToken = pm.collectionVariables.get('refreshToken');",
+                  "if (refreshToken) {",
+                  "  pm.cookies.jar().set(pm.request.url, 'refreshToken', refreshToken, function () {});",
+                  "}"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  pm.collectionVariables.unset('accessToken');",
+                  "  pm.collectionVariables.unset('refreshToken');",
+                  "}"
+                ]
+              }
+            }
+          ],
           "request": {
             "method": "POST",
             "header": [],
-            "description": "Compatibility logout route for the custom JWT/cookie flow.",
+            "description": "Legacy logout route for the custom token flow. On success, the collection clears `accessToken` and `refreshToken` automatically.",
             "url": {
               "raw": "{{baseUrl}}{{apiPrefix}}/auth/logout",
               "host": [
@@ -427,8 +489,13 @@
           ],
           "request": {
             "method": "GET",
-            "header": [],
-            "description": "Fetch the authenticated user's profile.\n\nProtected: requires a valid Better Auth session.",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "description": "Fetch the authenticated user's profile.\n\nProtected: accepts either a valid Better Auth session or `Authorization: Bearer {{accessToken}}` from the legacy token flow.",
             "url": {
               "raw": "{{baseUrl}}{{apiPrefix}}/users/me",
               "host": [
@@ -449,11 +516,15 @@
             "method": "PATCH",
             "header": [
               {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
                 "key": "Content-Type",
                 "value": "application/json"
               }
             ],
-            "description": "Update the authenticated user's profile.\n\nAllowed fields based on current validation:\n- name\n- phone\n- avatar\n\nProtected: requires a valid Better Auth session.",
+            "description": "Update the authenticated user's profile.\n\nAllowed fields based on current validation:\n- name\n- phone\n- avatar\n\nProtected: accepts either a valid Better Auth session or `Authorization: Bearer {{accessToken}}`.",
             "body": {
               "mode": "raw",
               "raw": "{\n  \"name\": \"Instructor Demo\",\n  \"phone\": \"+8801700000000\",\n  \"avatar\": \"https://example.com/avatar.jpg\"\n}"
@@ -476,8 +547,13 @@
           "name": "Protected - Get My Learning Summary",
           "request": {
             "method": "GET",
-            "header": [],
-            "description": "Fetch the authenticated user's current learning summary.\n\nProtected: requires a valid Better Auth session.",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "description": "Fetch the authenticated user's current learning summary.\n\nProtected: accepts either a valid Better Auth session or `Authorization: Bearer {{accessToken}}`.",
             "url": {
               "raw": "{{baseUrl}}{{apiPrefix}}/users/me/learning",
               "host": [
@@ -552,8 +628,13 @@
           "name": "Admin - List All Categories",
           "request": {
             "method": "GET",
-            "header": [],
-            "description": "List all course categories, including inactive ones.\n\nProtected: requires an authenticated admin session.",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "description": "List all course categories, including inactive ones.\n\nProtected: requires admin access via Better Auth session or Bearer token.",
             "url": {
               "raw": "{{baseUrl}}{{apiPrefix}}/categories/admin/all?page=1&limit=10",
               "host": [
@@ -601,11 +682,15 @@
             "method": "POST",
             "header": [
               {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
                 "key": "Content-Type",
                 "value": "application/json"
               }
             ],
-            "description": "Create a course category.\n\nBody rules:\n- name: 2 to 100 chars\n- slug: lowercase kebab-case\n\nProtected: requires an authenticated admin session.",
+            "description": "Create a course category.\n\nBody rules:\n- name: 2 to 100 chars\n- slug: lowercase kebab-case\n\nProtected: requires admin access via Better Auth session or Bearer token.",
             "body": {
               "mode": "raw",
               "raw": "{\n  \"name\": \"Web Development\",\n  \"slug\": \"web-development\"\n}"
@@ -646,11 +731,15 @@
             "method": "PATCH",
             "header": [
               {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
                 "key": "Content-Type",
                 "value": "application/json"
               }
             ],
-            "description": "Update a course category.\n\nAllowed fields:\n- name\n- slug\n- isActive\n\nProtected: requires an authenticated admin session.",
+            "description": "Update a course category.\n\nAllowed fields:\n- name\n- slug\n- isActive\n\nProtected: requires admin access via Better Auth session or Bearer token.",
             "body": {
               "mode": "raw",
               "raw": "{\n  \"name\": \"Web Development Updated\",\n  \"slug\": \"web-development-updated\",\n  \"isActive\": true\n}"
@@ -749,8 +838,13 @@
           "name": "Instructor - List My Courses",
           "request": {
             "method": "GET",
-            "header": [],
-            "description": "List the authenticated instructor's own courses.\n\nSupported query params:\n- page\n- limit\n- search\n- status\n- sort\n\nStatus values:\n- DRAFT\n- PENDING_REVIEW\n- PUBLISHED\n- REJECTED\n- ARCHIVED\n\nSort values:\n- newest\n- oldest\n- updated_desc\n- price_asc\n- price_desc\n\nProtected: requires an authenticated instructor or admin session.",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "description": "List the authenticated instructor's own courses.\n\nSupported query params:\n- page\n- limit\n- search\n- status\n- sort\n\nStatus values:\n- DRAFT\n- PENDING_REVIEW\n- PUBLISHED\n- REJECTED\n- ARCHIVED\n\nSort values:\n- newest\n- oldest\n- updated_desc\n- price_asc\n- price_desc\n\nProtected: requires instructor/admin access via Better Auth session or Bearer token.",
             "url": {
               "raw": "{{baseUrl}}{{apiPrefix}}/courses/me?page=1&limit=10&status=DRAFT&sort=updated_desc",
               "host": [
@@ -805,11 +899,15 @@
             "method": "POST",
             "header": [
               {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
                 "key": "Content-Type",
                 "value": "application/json"
               }
             ],
-            "description": "Create a draft course.\n\nBody rules:\n- title: 3 to 160 chars\n- shortDescription: optional, max 240 chars\n- description: 20 to 10000 chars\n- thumbnail: optional URL\n- price: number >= 0\n- categoryId: optional UUID\n\nProtected: requires an authenticated instructor or admin session.",
+            "description": "Create a draft course.\n\nBody rules:\n- title: 3 to 160 chars\n- shortDescription: optional, max 240 chars\n- description: 20 to 10000 chars\n- thumbnail: optional URL\n- price: number >= 0\n- categoryId: optional UUID\n\nProtected: requires instructor/admin access via Better Auth session or Bearer token.",
             "body": {
               "mode": "raw",
               "raw": "{\n  \"title\": \"Modern Node.js For Course Platforms\",\n  \"shortDescription\": \"Build a production-ready backend with TypeScript and Prisma.\",\n  \"description\": \"This course walks through architecture, auth, Prisma modeling, modular services, and production-grade API design for a course marketplace backend.\",\n  \"thumbnail\": \"https://images.example.com/node-course.jpg\",\n  \"price\": 49.99,\n  \"categoryId\": \"{{categoryId}}\"\n}"
@@ -849,11 +947,15 @@
             "method": "PATCH",
             "header": [
               {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
                 "key": "Content-Type",
                 "value": "application/json"
               }
             ],
-            "description": "Update a mutable instructor-owned course.\n\nAllowed fields:\n- title\n- shortDescription\n- description\n- thumbnail\n- price\n- categoryId\n\nProtected: requires an authenticated instructor or admin session.",
+            "description": "Update a mutable instructor-owned course.\n\nAllowed fields:\n- title\n- shortDescription\n- description\n- thumbnail\n- price\n- categoryId\n\nProtected: requires instructor/admin access via Better Auth session or Bearer token.",
             "body": {
               "mode": "raw",
               "raw": "{\n  \"title\": \"Modern Node.js For Course Platforms - Updated\",\n  \"shortDescription\": \"Updated short description for the course.\",\n  \"price\": 59.99\n}"
@@ -876,8 +978,13 @@
           "name": "Instructor - Delete Course",
           "request": {
             "method": "DELETE",
-            "header": [],
-            "description": "Soft-delete an instructor-owned course.\n\nProtected: requires an authenticated instructor or admin session.",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "description": "Soft-delete an instructor-owned course.\n\nProtected: requires instructor/admin access via Better Auth session or Bearer token.",
             "url": {
               "raw": "{{baseUrl}}{{apiPrefix}}/courses/{{courseId}}",
               "host": [
@@ -896,8 +1003,13 @@
           "name": "Instructor - Submit Course For Review",
           "request": {
             "method": "POST",
-            "header": [],
-            "description": "Submit a draft or rejected course for moderation review.\n\nProtected: requires an authenticated instructor or admin session.",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "description": "Submit a draft or rejected course for moderation review.\n\nProtected: requires instructor/admin access via Better Auth session or Bearer token.",
             "url": {
               "raw": "{{baseUrl}}{{apiPrefix}}/courses/{{courseId}}/submit",
               "host": [
@@ -908,6 +1020,146 @@
                 "courses",
                 "{{courseId}}",
                 "submit"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Lessons",
+      "description": "Lesson management, preview listing, and guarded playback access.",
+      "item": [
+        {
+          "name": "Public - List Course Lessons",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "description": "List lessons for a course.\n\nBehavior:\n- if the requester is the course owner or an admin with a valid Better Auth session, returns all lessons\n- otherwise, only preview lessons are returned, and only for published courses",
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/courses/{{courseId}}/lessons",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{apiPrefix}}",
+                "courses",
+                "{{courseId}}",
+                "lessons"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Instructor - Create Lesson",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "description": "Create a lesson for an instructor-owned course.\n\nAllowed only for course owners/admins. Non-admin instructors can only mutate lessons while the course is in DRAFT or REJECTED status.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Introduction And Project Setup\",\n  \"summary\": \"Overview of the course and environment setup.\",\n  \"orderIndex\": 1,\n  \"videoProvider\": \"MUX\",\n  \"providerAssetId\": \"asset_123456\",\n  \"providerPlaybackRef\": \"playback_abcdef\",\n  \"durationSeconds\": 540,\n  \"isPreview\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/courses/{{courseId}}/lessons",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{apiPrefix}}",
+                "courses",
+                "{{courseId}}",
+                "lessons"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Instructor - Update Lesson",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "description": "Update a lesson. Supported fields:\n- title\n- summary\n- orderIndex\n- videoProvider\n- providerAssetId\n- providerPlaybackRef\n- durationSeconds\n- isPreview",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Introduction And Project Setup - Updated\",\n  \"orderIndex\": 2,\n  \"isPreview\": false,\n  \"durationSeconds\": 600\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/lessons/{{lessonId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{apiPrefix}}",
+                "lessons",
+                "{{lessonId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Instructor - Delete Lesson",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "description": "Delete a lesson from an instructor-owned course.",
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/lessons/{{lessonId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{apiPrefix}}",
+                "lessons",
+                "{{lessonId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Protected - Get Lesson Playback",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "description": "Fetch safe lesson playback metadata.\n\nAccess rules:\n- owner/admin: allowed\n- enrolled student: allowed\n- public: allowed only if the lesson is a preview lesson on a published course\n\nThe response intentionally returns `providerPlaybackRef` only and does not expose `providerAssetId`.",
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/lessons/{{lessonId}}/playback",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{apiPrefix}}",
+                "lessons",
+                "{{lessonId}}",
+                "playback"
               ]
             }
           },

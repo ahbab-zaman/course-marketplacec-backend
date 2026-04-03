@@ -691,7 +691,41 @@ Build the core course catalog and instructor course management flow.
 
 ## 12. Implement Lesson Module
 
-**Status:** `[ ]`
+**Status:** `[~]`
+
+**Completed work so far:**
+
+- Added a full `lesson` module in the standard layered pattern:
+  - repository
+  - service
+  - controller
+  - validator
+  - types
+  - routes
+- Added lesson endpoints:
+  - `GET /api/v1/courses/:courseId/lessons`
+  - `POST /api/v1/courses/:courseId/lessons`
+  - `PATCH /api/v1/lessons/:id`
+  - `DELETE /api/v1/lessons/:id`
+  - `GET /api/v1/lessons/:lessonId/playback`
+- Implemented lesson ordering with unique `orderIndex` per course.
+- Enforced course ownership checks for instructor/admin lesson management.
+- Restricted instructor lesson mutations to draft or rejected courses.
+- Added preview lesson behavior:
+  - public lesson list returns preview lessons only for published courses
+  - playback allows preview access without enrollment only when `isPreview` is true
+- Added playback access checks for:
+  - course owner
+  - admin
+  - enrolled student
+  - public preview access
+- Kept playback responses safe by returning `providerPlaybackRef` only and never exposing `providerAssetId`.
+
+**Remaining work in this phase:**
+
+- Add provider-specific signed playback integration once the concrete video provider service is implemented.
+- Add lesson reordering helper endpoints if the product needs batch reorder operations later.
+- Expand student curriculum access behavior further when the enrollment module lands.
 
 **Objective:**
 Add lesson management and protected playback access.
@@ -904,6 +938,7 @@ Add admin moderation and platform reporting endpoints.
   - `user`
   - `course-category`
   - `course`
+  - `lesson`
 - Kept `/api/v1` as the active business API namespace.
 - Better Auth remains mounted under `/api/auth/*`.
 

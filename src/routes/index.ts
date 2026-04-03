@@ -4,6 +4,7 @@ import userRoutes from "../modules/user/user.routes";
 import courseCategoryRoutes from "../modules/course-category/course-category.routes";
 import courseRoutes from "../modules/course/course.routes";
 import authRoutes from "../modules/auth/auth.routes";
+import lessonRoutes from "../modules/lesson/lesson.routes";
 
 const router = Router();
 
@@ -15,6 +16,7 @@ v1.use("/auth", authRoutes);
 v1.use("/users", userRoutes);
 v1.use("/categories", courseCategoryRoutes);
 v1.use("/courses", courseRoutes);
+v1.use("/", lessonRoutes);
 
 router.use("/v1", v1);
 
