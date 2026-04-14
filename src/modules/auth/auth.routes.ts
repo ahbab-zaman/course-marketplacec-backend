@@ -33,6 +33,7 @@ router.post("/resend-otp", authLimiter, authController.resendOTP);
 router.post("/login", authLimiter, authController.login);
 router.post("/refresh", authController.refreshToken);
 router.post("/logout", authController.logout);
+router.get("/me", authController.getCurrentUser);
 
 // ─── Dashboard (Success Page) ────────────────────────────────────────────────
 router.get("/dashboard", (req, res) => {

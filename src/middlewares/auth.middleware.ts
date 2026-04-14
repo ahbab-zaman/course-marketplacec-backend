@@ -3,19 +3,17 @@ import { verifyAccessToken } from "../utils/token";
 import { prisma } from "../database/prisma";
 import { Role } from "@prisma/client";
 
-export async function getRequestUserFromBearerToken(req: Request) {
+export async function getRequestUser(req: Request) {
+  let token = null;
   const authHeader = req.headers.authorization;
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    return null;
+  if (authHeader && authHeader.startsWith("Bearer ")) {
+    token = authHeader.split(" ")[1];
+  } else {
+    token = req.cookies.accessToken;
   }
-
-  const token = authHeader.split(" ")[1];
+  if (!token) return null;
   const decoded = verifyAccessToken(token);
-
-  if (!decoded) {
-    return null;
-  }
-
+  if (!decoded) return null;
   const user = await prisma.user.findUnique({
     where: { id: decoded.userId },
     select: {
@@ -27,11 +25,7 @@ export async function getRequestUserFromBearerToken(req: Request) {
       isEmailVerified: true,
     },
   });
-
-  if (!user || user.isBlocked) {
-    return null;
-  }
-
+  if (!user || user.isBlocked) return null;
   return {
     id: user.id,
     role: user.role,
@@ -48,7 +42,7 @@ export const authenticate = async (
   next: NextFunction,
 ) => {
   try {
-    const user = await getRequestUserFromBearerToken(req);
+    const user = await getRequestUser(req);
 
     if (!user) {
       return res.status(401).json({ error: "Unauthorized: Missing token" });

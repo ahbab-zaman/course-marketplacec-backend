@@ -4,6 +4,7 @@ import { registerSchema, loginSchema, otpSchema, resendOtpSchema } from "./auth.
 import { OtpType, Role } from "@prisma/client";
 import { env } from "../../config/env";
 import { success } from "../../shared/utils/response";
+import { getRequestUser } from "../../middlewares/auth.middleware";
 
 const authService = new AuthService();
 
@@ -86,7 +87,7 @@ export class AuthController {
 
   async refreshToken(req: Request, res: Response, next: NextFunction) {
     try {
-      const refreshToken = req.cookies.refreshToken as string | undefined;
+      const refreshToken = req.cookies.refreshToken || req.body.refreshToken as string | undefined;
       if (!refreshToken) throw httpError(401, "Refresh token missing");
 
       const result = await authService.refreshToken(refreshToken);
@@ -132,6 +133,18 @@ export class AuthController {
       res.clearCookie("refreshToken");
 
       return success(res, {}, "Logged out successfully");
+    } catch (err) {
+      return next(err);
+    }
+  }
+
+  async getCurrentUser(req: Request, res: Response, next: NextFunction) {
+    try {
+      const user = await getRequestUser(req);
+      if (!user) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+      return success(res, { user }, "User retrieved successfully");
     } catch (err) {
       return next(err);
     }

@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import { Role } from "@prisma/client";
 
 import { auth } from "../../modules/auth/auth";
-import { getRequestUserFromBearerToken } from "../../middlewares/auth.middleware";
+import { getRequestUser } from "../../middlewares/auth.middleware";
 
 const authorize = (...roles: Role[]) => {
   return async (req: Request, res: Response, next: NextFunction) => {
@@ -13,7 +13,7 @@ const authorize = (...roles: Role[]) => {
       });
 
       if (!session) {
-        const tokenUser = await getRequestUserFromBearerToken(req);
+        const tokenUser = await getRequestUser(req);
 
         if (!tokenUser) {
           return res.status(401).json({

@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { Role } from "@prisma/client";
 import { auth } from "../../modules/auth/auth";
-import { getRequestUserFromBearerToken } from "../../middlewares/auth.middleware";
+import { getRequestUser } from "../../middlewares/auth.middleware";
 
 const optionalAuthorize = () => {
   return async (req: Request, _res: Response, next: NextFunction) => {
@@ -11,7 +11,7 @@ const optionalAuthorize = () => {
       });
 
       if (!session) {
-        const tokenUser = await getRequestUserFromBearerToken(req);
+        const tokenUser = await getRequestUser(req);
         if (tokenUser) {
           req.user = tokenUser;
         }
