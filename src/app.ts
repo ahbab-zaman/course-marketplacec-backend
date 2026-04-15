@@ -17,6 +17,9 @@ const API_VERSION = "v1";
 // app initialization
 const app: Application = express();
 
+// ⚠️ IMPORTANT: CORS must be applied BEFORE Better Auth handler
+app.use(cors);
+
 // ⚠️ IMPORTANT: Better Auth handler MUST be registered BEFORE express.json()
 // because express.json() consumes the raw body stream, making it unavailable
 // for toNodeHandler which needs to read the body itself.

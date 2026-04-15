@@ -5,7 +5,7 @@ model Session {
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   // Security
-  refreshToken String // Hashed
+  refreshToken String? // Hashed for legacy custom auth flow
   userAgent    String?
   ipAddress    String?
   isRevoked    Boolean @default(false)

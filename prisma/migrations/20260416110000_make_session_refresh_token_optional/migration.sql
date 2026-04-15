@@ -1,0 +1,2 @@
+ALTER TABLE "session"
+ALTER COLUMN "refreshToken" DROP NOT NULL;
