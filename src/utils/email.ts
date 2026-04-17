@@ -1,7 +1,7 @@
 import nodemailer from "nodemailer";
-import { env } from "../config/env";
-import { getVerificationOtpEmailTemplate } from "../shared/email/email-templates";
-import { authRepository } from "../modules/auth/auth.repository";
+import { env } from "../config/env.js";
+import { getVerificationOtpEmailTemplate } from "../shared/email/email-templates.js";
+import { authRepository } from "../modules/auth/auth.repository.js";
 
 const transporter = nodemailer.createTransport({
   host: env.email.host,

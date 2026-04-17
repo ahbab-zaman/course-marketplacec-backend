@@ -1,12 +1,12 @@
 import express, { Application, Request, Response } from "express";
-import { cors } from "./config/cors";
-import { helmet } from "./config/helmet";
-import { logger } from "./config/logger";
-import { limiter } from "./config/rate-limit";
-import { apiRoutes } from "./routes";
-import { errorHandler } from "./shared/middlewares/error.middleware";
-import { notFound } from "./shared/middlewares/not-found.middleware";
-import { auth } from "./modules/auth/auth";
+import { cors } from "./config/cors.js";
+import { helmet } from "./config/helmet.js";
+import { logger } from "./config/logger.js";
+import { limiter } from "./config/rate-limit.js";
+import { apiRoutes } from "./routes/index.js";
+import { errorHandler } from "./shared/middlewares/error.middleware.js";
+import { notFound } from "./shared/middlewares/not-found.middleware.js";
+import { auth } from "./modules/auth/auth.js";
 import { toNodeHandler } from "better-auth/node";
 
 import cookieParser from "cookie-parser";

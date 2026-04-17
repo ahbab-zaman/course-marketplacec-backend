@@ -1,14 +1,14 @@
 import { CourseStatus, Prisma, Role } from "@prisma/client";
-import ApiError from "../../shared/errors/api-error";
-import { getPagination } from "../../shared/utils/pagination";
-import { courseCategoryRepository } from "../course-category/course-category.repository";
+import ApiError from "../../shared/errors/api-error.js";
+import { getPagination } from "../../shared/utils/pagination.js";
+import { courseCategoryRepository } from "../course-category/course-category.repository.js";
 import {
   CourseListQuery,
   CreateCourseDTO,
   MyCourseListQuery,
   UpdateCourseDTO,
-} from "./course.types";
-import { courseRepository } from "./course.repository";
+} from "./course.types.js";
+import { courseRepository } from "./course.repository.js";
 
 type AuthenticatedUser = {
   id: string;

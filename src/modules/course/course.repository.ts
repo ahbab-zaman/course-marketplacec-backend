@@ -1,5 +1,5 @@
 import { CourseStatus, Prisma } from "@prisma/client";
-import { prisma } from "../../database/prisma";
+import { prisma } from "../../database/prisma.js";
 
 const publicCourseSelect = {
   id: true,

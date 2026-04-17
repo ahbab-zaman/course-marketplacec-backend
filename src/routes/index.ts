@@ -1,10 +1,10 @@
 import { Router } from "express";
-import { healthRoutes } from "../modules/health/health.route";
-import userRoutes from "../modules/user/user.routes";
-import courseCategoryRoutes from "../modules/course-category/course-category.routes";
-import courseRoutes from "../modules/course/course.routes";
-import authRoutes from "../modules/auth/auth.routes";
-import lessonRoutes from "../modules/lesson/lesson.routes";
+import { healthRoutes } from "../modules/health/health.route.js";
+import userRoutes from "../modules/user/user.routes.js";
+import courseCategoryRoutes from "../modules/course-category/course-category.routes.js";
+import courseRoutes from "../modules/course/course.routes.js";
+import authRoutes from "../modules/auth/auth.routes.js";
+import lessonRoutes from "../modules/lesson/lesson.routes.js";
 
 const router = Router();
 

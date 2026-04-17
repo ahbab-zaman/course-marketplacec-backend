@@ -1,14 +1,14 @@
 import { NextFunction, Request, Response } from "express";
-import ApiError from "../../shared/errors/api-error";
-import { success } from "../../shared/utils/response";
-import { lessonService } from "./lesson.service";
+import ApiError from "../../shared/errors/api-error.js";
+import { success } from "../../shared/utils/response.js";
+import { lessonService } from "./lesson.service.js";
 import {
   courseLessonParamsSchema,
   createLessonSchema,
   lessonIdParamSchema,
   lessonIdUpdateParamSchema,
   updateLessonSchema,
-} from "./lesson.validator";
+} from "./lesson.validator.js";
 
 export class LessonController {
   async createLesson(req: Request, res: Response, next: NextFunction) {

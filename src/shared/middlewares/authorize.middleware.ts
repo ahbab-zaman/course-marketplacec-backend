@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { Role } from "@prisma/client";
 
-import { auth } from "../../modules/auth/auth";
+import { auth } from "../../modules/auth/auth.js";
 
 const authorize = (...roles: Role[]) => {
   return async (req: Request, res: Response, next: NextFunction) => {

@@ -1,7 +1,7 @@
 import { Router } from "express";
-import { AuthController } from "./auth.controller";
-import { GoogleAuthController } from "./google-auth.controller";
-import { authLimiter } from "../../middlewares/rate-limit.middleware";
+import { AuthController } from "./auth.controller.js";
+import { GoogleAuthController } from "./google-auth.controller.js";
+import { authLimiter } from "../../middlewares/rate-limit.middleware.js";
 
 const router = Router();
 const authController = new AuthController();

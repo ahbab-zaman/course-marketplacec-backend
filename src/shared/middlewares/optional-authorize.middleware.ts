@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { Role } from "@prisma/client";
-import { auth } from "../../modules/auth/auth";
+import { auth } from "../../modules/auth/auth.js";
 
 const optionalAuthorize = () => {
   return async (req: Request, _res: Response, next: NextFunction) => {

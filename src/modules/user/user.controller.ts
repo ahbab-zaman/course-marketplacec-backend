@@ -1,8 +1,8 @@
 import { NextFunction, Request, Response } from "express";
-import ApiError from "../../shared/errors/api-error";
-import { success } from "../../shared/utils/response";
-import { userService } from "./user.service";
-import { updateUserProfileSchema } from "./user.validator";
+import ApiError from "../../shared/errors/api-error.js";
+import { success } from "../../shared/utils/response.js";
+import { userService } from "./user.service.js";
+import { updateUserProfileSchema } from "./user.validator.js";
 
 export class UserController {
   async getMe(req: Request, res: Response, next: NextFunction) {

@@ -1,10 +1,10 @@
 import { NextFunction, Request, Response } from "express";
-import { AuthService } from "./auth.service";
-import { registerSchema, loginSchema, otpSchema, resendOtpSchema } from "./auth.validators";
+import { AuthService } from "./auth.service.js";
+import { registerSchema, loginSchema, otpSchema, resendOtpSchema } from "./auth.validators.js";
 import { OtpType, Role } from "@prisma/client";
-import { env } from "../../config/env";
-import { success } from "../../shared/utils/response";
-import { auth } from "./auth";
+import { env } from "../../config/env.js";
+import { success } from "../../shared/utils/response.js";
+import { auth } from "./auth.js";
 
 const authService = new AuthService();
 

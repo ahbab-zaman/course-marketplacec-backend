@@ -1,11 +1,11 @@
-import ApiError from "../../shared/errors/api-error";
-import { getPagination } from "../../shared/utils/pagination";
-import { courseCategoryRepository } from "./course-category.repository";
+import ApiError from "../../shared/errors/api-error.js";
+import { getPagination } from "../../shared/utils/pagination.js";
+import { courseCategoryRepository } from "./course-category.repository.js";
 import {
   CourseCategoryQuery,
   CreateCourseCategoryDTO,
   UpdateCourseCategoryDTO,
-} from "./course-category.types";
+} from "./course-category.types.js";
 
 export class CourseCategoryService {
   async getPublicCategories(query: CourseCategoryQuery) {

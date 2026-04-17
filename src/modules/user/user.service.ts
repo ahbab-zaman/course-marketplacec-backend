@@ -1,6 +1,6 @@
-import ApiError from "../../shared/errors/api-error";
-import { userRepository } from "./user.repository";
-import { UpdateUserProfileDTO } from "./user.types";
+import ApiError from "../../shared/errors/api-error.js";
+import { userRepository } from "./user.repository.js";
+import { UpdateUserProfileDTO } from "./user.types.js";
 
 export class UserService {
   async getProfile(userId: string) {

@@ -1,8 +1,8 @@
 import { Role, AuthProvider } from "@prisma/client";
-import { prisma } from "../../database/prisma";
-import { generateAccessToken, generateRefreshToken } from "../../utils/token";
-import { hashToken } from "../../utils/hash";
-import ApiError from "../../shared/errors/api-error";
+import { prisma } from "../../database/prisma.js";
+import { generateAccessToken, generateRefreshToken } from "../../utils/token.js";
+import { hashToken } from "../../utils/hash.js";
+import ApiError from "../../shared/errors/api-error.js";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 

@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
-import { auth } from "./auth";
-import { env } from "../../config/env";
-import ApiError from "../../shared/errors/api-error";
+import { auth } from "./auth.js";
+import { env } from "../../config/env.js";
+import ApiError from "../../shared/errors/api-error.js";
 
 export class GoogleAuthController {
   /**

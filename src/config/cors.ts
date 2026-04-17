@@ -1,5 +1,5 @@
 import createCors from "cors";
-import { env } from "./env";
+import { env } from "./env.js";
 
 const origin = env.isProduction
   ? env.corsOrigin

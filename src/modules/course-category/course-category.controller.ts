@@ -1,11 +1,11 @@
 import { NextFunction, Request, Response } from "express";
-import { success } from "../../shared/utils/response";
-import { courseCategoryService } from "./course-category.service";
+import { success } from "../../shared/utils/response.js";
+import { courseCategoryService } from "./course-category.service.js";
 import {
   courseCategoryQuerySchema,
   createCourseCategorySchema,
   updateCourseCategorySchema,
-} from "./course-category.validator";
+} from "./course-category.validator.js";
 
 export class CourseCategoryController {
   async getPublicCategories(req: Request, res: Response, next: NextFunction) {

@@ -2,7 +2,7 @@ import multer from "multer";
 import path from "path";
 import fs from "fs";
 import { Request } from "express";
-import ApiError from "../shared/errors/api-error";
+import ApiError from "../shared/errors/api-error.js";
 
 const fileFilter = (
   req: Request,

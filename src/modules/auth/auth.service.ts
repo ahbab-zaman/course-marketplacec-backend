@@ -1,12 +1,12 @@
-import { hashValue, compareValue, hashToken } from "../../utils/hash";
+import { hashValue, compareValue, hashToken } from "../../utils/hash.js";
 import {
   generateAccessToken,
   generateRefreshToken,
   generateOTP,
-} from "../../utils/token";
-import { sendOTPEmail } from "../../utils/email";
+} from "../../utils/token.js";
+import { sendOTPEmail } from "../../utils/email.js";
 import { Role, OtpType } from "@prisma/client";
-import { authRepository } from "./auth.repository";
+import { authRepository } from "./auth.repository.js";
 
 export class AuthService {
   async register(data: {

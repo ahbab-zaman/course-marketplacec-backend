@@ -1,4 +1,4 @@
-import { prisma } from "../../database/prisma";
+import { prisma } from "../../database/prisma.js";
 import { OtpType, Prisma, Role } from "@prisma/client";
 
 export type CreateUserInput = {

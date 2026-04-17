@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
-import ApiError from "../../shared/errors/api-error";
-import { success } from "../../shared/utils/response";
-import { courseService } from "./course.service";
+import ApiError from "../../shared/errors/api-error.js";
+import { success } from "../../shared/utils/response.js";
+import { courseService } from "./course.service.js";
 import {
   courseIdParamSchema,
   courseIdentifierSchema,
@@ -9,7 +9,7 @@ import {
   createCourseSchema,
   myCourseListQuerySchema,
   updateCourseSchema,
-} from "./course.validator";
+} from "./course.validator.js";
 
 export class CourseController {
   async createCourse(req: Request, res: Response, next: NextFunction) {

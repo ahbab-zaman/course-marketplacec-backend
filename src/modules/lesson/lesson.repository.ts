@@ -1,5 +1,5 @@
 import { EnrollmentStatus, Prisma } from "@prisma/client";
-import { prisma } from "../../database/prisma";
+import { prisma } from "../../database/prisma.js";
 
 const instructorLessonSelect = {
   id: true,

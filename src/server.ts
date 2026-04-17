@@ -3,14 +3,14 @@ const APP_NAME = "Course Marketplace Backend";
 async function startServer() {
   try {
     // Validate environment variables before loading the app (fail fast)
-    const { env } = await import("./config/env");
+    const { env } = await import("./config/env.js");
     console.log(`[startup] Booting ${APP_NAME} in ${env.node_env} mode`);
 
     const [{ setupAuth }, { checkDatabaseConnection }, { default: app }] =
       await Promise.all([
-        import("./modules/auth/auth"),
-        import("./database/checkConnection"),
-        import("./app"),
+        import("./modules/auth/auth.js"),
+        import("./database/checkConnection.js"),
+        import("./app.js"),
       ]);
 
     await setupAuth();

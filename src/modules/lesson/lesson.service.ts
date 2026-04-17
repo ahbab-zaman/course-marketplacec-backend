@@ -1,8 +1,8 @@
 import { CourseStatus, Prisma, Role } from "@prisma/client";
-import ApiError from "../../shared/errors/api-error";
-import { courseRepository } from "../course/course.repository";
-import { CreateLessonDTO, UpdateLessonDTO } from "./lesson.types";
-import { lessonRepository } from "./lesson.repository";
+import ApiError from "../../shared/errors/api-error.js";
+import { courseRepository } from "../course/course.repository.js";
+import { CreateLessonDTO, UpdateLessonDTO } from "./lesson.types.js";
+import { lessonRepository } from "./lesson.repository.js";
 
 type AuthenticatedUser = {
   id: string;

@@ -1,13 +1,13 @@
 import { betterAuth } from "better-auth";
-import { sendEmail } from "../../shared/email/email-service";
+import { sendEmail } from "../../shared/email/email-service.js";
 import {
   getPasswordResetEmailTemplate,
   getVerificationEmailTemplate,
-} from "../../shared/email/email-templates";
-import { prisma } from "../../database/prisma";
+} from "../../shared/email/email-templates.js";
+import { prisma } from "../../database/prisma.js";
 import { prismaAdapter } from "better-auth/adapters/prisma";
-import { env } from "../../config/env";
-import { compareValue, hashValue } from "../../utils/hash";
+import { env } from "../../config/env.js";
+import { compareValue, hashValue } from "../../utils/hash.js";
 
 export async function initAuth() {
   return betterAuth({
