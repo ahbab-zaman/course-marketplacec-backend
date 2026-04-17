@@ -4,7 +4,7 @@ import { registerSchema, loginSchema, otpSchema, resendOtpSchema } from "./auth.
 import { OtpType, Role } from "@prisma/client";
 import { env } from "../../config/env";
 import { success } from "../../shared/utils/response";
-import { getRequestUser } from "../../middlewares/auth.middleware";
+import { auth } from "./auth";
 
 const authService = new AuthService();
 
@@ -140,11 +140,26 @@ export class AuthController {
 
   async getCurrentUser(req: Request, res: Response, next: NextFunction) {
     try {
-      const user = await getRequestUser(req);
-      if (!user) {
-        return res.status(401).json({ message: "Unauthorized" });
+      const session = await auth?.api.getSession({
+        headers: req.headers as any,
+      });
+
+      if (!session) {
+        return res.status(401).json({ success: false, message: "Unauthorized" });
       }
-      return success(res, { user }, "User retrieved successfully");
+
+      return success(
+        res,
+        {
+          id: session.user.id,
+          email: session.user.email,
+          name: session.user.name,
+          role: session.user.role,
+          isEmailVerified: session.user.emailVerified,
+          avatar: session.user.image ?? null,
+        },
+        "User retrieved successfully",
+      );
     } catch (err) {
       return next(err);
     }
