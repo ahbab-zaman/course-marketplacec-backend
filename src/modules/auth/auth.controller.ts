@@ -75,6 +75,20 @@ export class AuthController {
         maxAge: 7 * 24 * 60 * 60 * 1000,
       });
 
+      // 3. Create Better Auth session
+      if (auth) {
+        const session = await auth.api.createSession({
+          userId: user.id,
+          expiresIn: 60 * 60 * 24 * 7,
+        });
+        res.cookie("better-auth.session_token", session.token, {
+          httpOnly: true,
+          secure: env.isProduction,
+          sameSite: "lax",
+          maxAge: 60 * 60 * 24 * 7,
+        });
+      }
+
       return success(
         res,
         { user, accessToken, refreshToken },
@@ -127,6 +141,9 @@ export class AuthController {
       if (refreshToken) {
         await authService.logout(refreshToken);
       }
+
+      // Clear Better Auth session
+      res.clearCookie("better-auth.session_token");
 
       // Clear auth cookies
       res.clearCookie("accessToken");
