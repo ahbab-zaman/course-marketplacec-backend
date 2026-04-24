@@ -151,6 +151,25 @@ export class CourseController {
       next(err);
     }
   }
+
+  async enrollCourse(req: Request, res: Response, next: NextFunction) {
+    try {
+      const userId = req.user?.id;
+      const role = req.user?.role;
+      if (!userId || !role) {
+        throw new ApiError(401, "Authentication required");
+      }
+
+      const params = courseIdParamSchema.parse(req.params);
+      const enrollment = await courseService.enrollInCourse(
+        { id: userId, role },
+        params.id,
+      );
+      return success(res, enrollment, "Enrollment created successfully");
+    } catch (err) {
+      next(err);
+    }
+  }
 }
 
 export const courseController = new CourseController();

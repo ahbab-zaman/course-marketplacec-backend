@@ -5,6 +5,8 @@ import { OtpType, Role } from "@prisma/client";
 import { env } from "../../config/env.js";
 import { success } from "../../shared/utils/response.js";
 import { auth } from "./auth.js";
+import { verifyAccessToken } from "../../utils/token.js";
+import { prisma } from "../../database/prisma.js";
 
 const authService = new AuthService();
 
@@ -74,20 +76,6 @@ export class AuthController {
         sameSite: "strict",
         maxAge: 7 * 24 * 60 * 60 * 1000,
       });
-
-      // 3. Create Better Auth session
-      if (auth) {
-        const session = await auth.api.createSession({
-          userId: user.id,
-          expiresIn: 60 * 60 * 24 * 7,
-        });
-        res.cookie("better-auth.session_token", session.token, {
-          httpOnly: true,
-          secure: env.isProduction,
-          sameSite: "lax",
-          maxAge: 60 * 60 * 24 * 7,
-        });
-      }
 
       return success(
         res,
@@ -161,19 +149,52 @@ export class AuthController {
         headers: req.headers as any,
       });
 
-      if (!session) {
+      if (session) {
+        return success(
+          res,
+          {
+            id: session.user.id,
+            email: session.user.email,
+            name: session.user.name,
+            role: session.user.role,
+            isEmailVerified: session.user.emailVerified,
+            avatar: session.user.image ?? null,
+          },
+          "User retrieved successfully",
+        );
+      }
+
+      const token = req.cookies?.accessToken as string | undefined;
+      const decoded = token ? verifyAccessToken(token) : null;
+      if (!decoded) {
+        return res.status(401).json({ success: false, message: "Unauthorized" });
+      }
+
+      const user = await prisma.user.findUnique({
+        where: { id: decoded.userId },
+        select: {
+          id: true,
+          email: true,
+          name: true,
+          role: true,
+          isEmailVerified: true,
+          avatar: true,
+        },
+      });
+
+      if (!user) {
         return res.status(401).json({ success: false, message: "Unauthorized" });
       }
 
       return success(
         res,
         {
-          id: session.user.id,
-          email: session.user.email,
-          name: session.user.name,
-          role: session.user.role,
-          isEmailVerified: session.user.emailVerified,
-          avatar: session.user.image ?? null,
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          role: user.role,
+          isEmailVerified: user.isEmailVerified,
+          avatar: user.avatar ?? null,
         },
         "User retrieved successfully",
       );

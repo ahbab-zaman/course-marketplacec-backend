@@ -142,6 +142,17 @@ export class CourseRepository {
     });
   }
 
+  findByIdForEnrollment(id: string) {
+    return prisma.course.findFirst({
+      where: { id, deletedAt: null },
+      select: {
+        id: true,
+        status: true,
+        price: true,
+      },
+    });
+  }
+
   create(data: Prisma.CourseCreateInput) {
     return prisma.course.create({
       data,
@@ -154,6 +165,31 @@ export class CourseRepository {
       where: { id },
       data,
       select: managedCourseSelect,
+    });
+  }
+
+  findEnrollment(userId: string, courseId: string) {
+    return prisma.enrollment.findUnique({
+      where: { userId_courseId: { userId, courseId } },
+      select: { id: true },
+    });
+  }
+
+  createEnrollment(userId: string, courseId: string) {
+    return prisma.enrollment.create({
+      data: {
+        userId,
+        courseId,
+        status: "ACTIVE",
+        accessGrantedAt: new Date(),
+      },
+      select: {
+        id: true,
+        userId: true,
+        courseId: true,
+        status: true,
+        accessGrantedAt: true,
+      },
     });
   }
 }

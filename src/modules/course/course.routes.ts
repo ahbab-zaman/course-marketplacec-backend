@@ -36,5 +36,10 @@ router.post(
   authorize(Role.INSTRUCTOR, Role.ADMIN),
   courseController.submitCourseForReview.bind(courseController),
 );
+router.post(
+  "/:id/enroll",
+  authorize(Role.STUDENT, Role.INSTRUCTOR, Role.ADMIN),
+  courseController.enrollCourse.bind(courseController),
+);
 
 export default router;

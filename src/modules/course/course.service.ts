@@ -343,6 +343,23 @@ export class CourseService {
       rejectionReason: null,
     });
   }
+
+  async enrollInCourse(user: AuthenticatedUser, courseId: string) {
+    const course = await courseRepository.findByIdForEnrollment(courseId);
+    if (!course) {
+      throw new ApiError(404, "Course not found");
+    }
+    if (course.status !== CourseStatus.PUBLISHED) {
+      throw new ApiError(409, "Only published courses can be enrolled");
+    }
+
+    const existing = await courseRepository.findEnrollment(user.id, courseId);
+    if (existing) {
+      throw new ApiError(409, "You are already enrolled in this course");
+    }
+
+    return courseRepository.createEnrollment(user.id, courseId);
+  }
 }
 
 export const courseService = new CourseService();
